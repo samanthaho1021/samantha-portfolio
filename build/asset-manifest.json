@@ -1,0 +1,10 @@
+{
+  "files": {
+    "main.js": "/static/js/main.cd4ceeab.js",
+    "index.html": "/index.html",
+    "main.cd4ceeab.js.map": "/static/js/main.cd4ceeab.js.map"
+  },
+  "entrypoints": [
+    "static/js/main.cd4ceeab.js"
+  ]
+}
