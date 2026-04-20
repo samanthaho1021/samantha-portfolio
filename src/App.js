@@ -107,7 +107,9 @@ function Nav() {
         <Link to="/about" style={linkStyle(location.pathname === '/about')}>About</Link>
         <a href="https://www.linkedin.com/in/samantha-ho-uxdesigner/" target="_blank" rel="noreferrer" style={linkStyle(false)}>LinkedIn</a>
         <a
-          href="#"
+          href="/resume.pdf"
+          target="_blank"
+          rel="noreferrer"
           style={{
             ...linkStyle(false),
             background: 'var(--accent)',
