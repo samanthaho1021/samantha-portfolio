@@ -547,307 +547,40 @@ function ExplorationTable({ rows }) {
   );
 }
 
+const PRM_VID = '/case-studies/prm/video';
+// Autoplaying product-demo video in a browser-chrome frame (fixed 16:10 screen).
+function PrmVideo({ src, url = 'console.suger.io/partners', radius = '12px' }) {
+  return (
+    <div style={{ border: '1px solid var(--border)', borderRadius: radius, overflow: 'hidden', boxShadow: '0 12px 40px rgba(62,42,31,0.10)' }}>
+      <div style={{ background: '#1a1a2e', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
+        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
+        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#22c55e' }} />
+        <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '4px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginLeft: '4px' }}>{url}</div>
+        <span style={{ background: '#F97316', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '100px' }}>PrimeOne DS</span>
+      </div>
+      <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', background: '#f8fafc' }}>
+        <video src={src} autoPlay loop muted playsInline preload="metadata" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} />
+      </div>
+    </div>
+  );
+}
+
 function PartnerDiscoverySection() {
   const [activeTab, setActiveTab] = useState('discovery');
-  const [discoveryStep, setDiscoveryStep] = useState('list');
-  const [inviteStep, setInviteStep] = useState(1);
+  const frameContent = (
+    <PrmVideo
+      radius="0"
+      url={`console.suger.io/partners${activeTab === 'invite' ? '/invite' : activeTab === 'collab' ? '/collaborations' : '/discovery'}`}
+      src={`${PRM_VID}/${activeTab === 'invite' ? 'invite' : activeTab === 'collab' ? 'collab' : 'discovery'}.mp4`}
+    />
+  );
 
   const tabs = [
     { id: 'discovery', label: '🔍 Partner Discovery' },
     { id: 'invite', label: '✦ Invite Wizard' },
     { id: 'collab', label: '🤝 Collaborations' },
   ];
-
-  const channelColors = {
-    AWS: { color: '#FF9900', bg: '#FFF3E0' },
-    Azure: { color: '#0078D4', bg: '#E3F2FF' },
-    GCP: { color: '#4285F4', bg: '#E8F0FE' },
-  };
-  const typeColors = { Reseller: '#A855F7', SI: '#10B981', ISV: '#F59E0B' };
-  const scoreColor = (s) => (s >= 90 ? '#10B981' : s >= 75 ? '#F59E0B' : '#EF4444');
-  const scoreBg = (s) => (s >= 90 ? '#DCFCE7' : s >= 75 ? '#FEF3C7' : '#FEE2E2');
-
-  const NavBar = () => (
-    <div style={{ background: '#1a1a2e', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
-        <div style={{ fontFamily: 'var(--serif)', color: 'white', fontSize: '18px', fontWeight: '500' }}>suger</div>
-        <div style={{ display: 'flex', gap: '20px', fontSize: '13px' }}>
-          {['Dashboard', 'Partners', 'Deals', 'Accounts', 'Reports'].map(l => (
-            <span key={l} style={{ color: l === 'Partners' ? 'white' : 'rgba(255,255,255,0.55)', fontWeight: l === 'Partners' ? '600' : '400' }}>{l}</span>
-          ))}
-        </div>
-      </div>
-      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-        <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>🔔</span>
-        <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#F97316', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '600' }}>SH</div>
-      </div>
-    </div>
-  );
-
-  const SubTabs = ({ active }) => {
-    const items = [
-      { id: 'all', label: 'All Partners' },
-      { id: 'discovery', label: 'Partner Discovery' },
-      { id: 'collab', label: 'Collaborations', badge: '6' },
-      { id: 'cosell', label: 'Partner Co-Sells' },
-    ];
-    return (
-      <div style={{ display: 'flex', gap: '0', borderBottom: '1px solid #e2e8f0', padding: '0 24px', background: 'white' }}>
-        {items.map(item => {
-          const on = item.id === active;
-          return (
-            <div key={item.id} style={{ padding: '14px 0', marginRight: '24px', fontSize: '14px', color: on ? '#1e293b' : '#64748b', fontWeight: on ? '600' : '400', borderBottom: on ? '2px solid #F97316' : '2px solid transparent', display: 'flex', gap: '6px', alignItems: 'center', cursor: 'pointer' }}>
-              {item.label}
-              {item.badge && <span style={{ fontSize: '10px', background: '#e2e8f0', color: '#64748b', padding: '1px 6px', borderRadius: '100px', fontWeight: '600' }}>{item.badge}</span>}
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
-
-  const scoreLabel = (s) => (s >= 90 ? 'High' : s >= 75 ? 'Medium' : 'Low');
-  const partners = [
-    { name: 'Stratosphere IT', type: 'Reseller', channels: ['AWS', 'Azure', 'GCP'], targets: 'Acme Corp, Northwind, +12', rev: '$4.2M', score: 94 },
-    { name: 'NexGen Consulting', type: 'SI', channels: ['Azure', 'GCP'], targets: 'Globex, Initech, +7', rev: '$3.1M', score: 87 },
-    { name: 'CloudSync Solutions', type: 'Reseller', channels: ['AWS', 'Azure'], targets: 'Umbrella Data, Hooli, +10', rev: '$2.5M', score: 91 },
-    { name: 'DataBridge Partners', type: 'SI', channels: ['AWS'], targets: 'Stark Systems, +6', rev: '$1.9M', score: 78 },
-    { name: 'Meridian Software', type: 'ISV', channels: ['Azure'], targets: 'Wayne Retail, +4', rev: '$1.6M', score: 72 },
-    { name: 'PeakCloud Tech', type: 'ISV', channels: ['AWS'], targets: 'Soylent, +3', rev: '$890K', score: 68 },
-  ];
-
-  const renderDiscoveryList = () => (
-    <div style={{ background: '#f8fafc' }}>
-      <NavBar />
-      <SubTabs active="discovery" />
-      <div style={{ padding: '24px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px', gap: '16px' }}>
-          <div>
-            <h3 style={{ fontSize: '20px', color: '#1e293b', fontWeight: '600', marginBottom: '4px' }}>✦ Suggested Partners <span style={{ color: '#94a3b8', fontWeight: '500' }}>(6)</span></h3>
-            <div style={{ fontSize: '13px', color: '#64748b' }}>Marketplace partners with potential deals matching your CRM accounts.</div>
-          </div>
-          <button onClick={() => setDiscoveryStep('invite')} style={{ background: '#F97316', color: 'white', fontSize: '13px', fontWeight: '600', padding: '10px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', flexShrink: 0 }}>+ Invite Partner</button>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
-          {partners.map(p => (
-            <div key={p.name} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px', gap: '8px' }}>
-                <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>{p.name}</div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: '600', color: scoreColor(p.score) }}>
-                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: scoreColor(p.score) }} />{scoreLabel(p.score)}
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '12px' }}>
-                <span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '100px', background: `${typeColors[p.type]}1a`, color: typeColors[p.type] }}>{p.type}</span>
-                {p.channels.map(c => (
-                  <span key={c} style={{ fontSize: '10px', fontWeight: '600', padding: '2px 6px', borderRadius: '4px', background: channelColors[c].bg, color: channelColors[c].color }}>{c}</span>
-                ))}
-              </div>
-              <div style={{ fontSize: '10px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Recommended Targets</div>
-              <div style={{ fontSize: '12px', color: '#475569', marginBottom: '12px' }}>{p.targets}</div>
-              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '10px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ fontSize: '10px', color: '#64748b' }}>Potential Revenue</div>
-                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#1e293b' }}>{p.rev}</div>
-                </div>
-                <button onClick={() => setDiscoveryStep('invite')} style={{ background: 'white', color: '#334155', fontSize: '12px', fontWeight: '600', padding: '7px 16px', borderRadius: '6px', border: '1px solid #cbd5e1', cursor: 'pointer' }}>Invite</button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-
-  const wizardSteps = ['Purpose', 'Context', 'Tone', 'Email', 'Review'];
-  const radio = (on) => ({ width: '15px', height: '15px', borderRadius: '50%', border: on ? '5px solid #F97316' : '2px solid #cbd5e1', flexShrink: 0 });
-  const fieldLabel = { fontSize: '11px', fontWeight: '600', color: '#475569', marginBottom: '4px', display: 'block' };
-  const fieldBox = { border: '1px solid #e2e8f0', borderRadius: '6px', padding: '8px 10px', fontSize: '13px', color: '#1e293b', background: 'white' };
-
-  const renderInviteFlow = () => (
-    <div style={{ background: '#f8fafc' }}>
-      <div style={{ background: '#1a1a2e', padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <span onClick={() => { setInviteStep(1); setDiscoveryStep('list'); if (activeTab === 'invite') setActiveTab('discovery'); }} style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', cursor: 'pointer' }}>← Back</span>
-        <div style={{ color: 'white', fontSize: '14px', fontWeight: '500' }}>Partner Engagement</div>
-      </div>
-      <div style={{ padding: '24px' }}>
-        {/* 5-step stepper */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '22px', flexWrap: 'wrap' }}>
-          {wizardSteps.map((label, i) => {
-            const n = i + 1; const active = inviteStep === n; const done = inviteStep > n;
-            return (
-              <React.Fragment key={label}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
-                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: done ? '#10B981' : active ? '#F97316' : '#e2e8f0', color: (done || active) ? 'white' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '600' }}>{done ? '✓' : n}</div>
-                  <span style={{ fontSize: '12px', color: active ? '#1e293b' : '#64748b', fontWeight: active ? '600' : '400' }}>{label}</span>
-                </div>
-                {i < wizardSteps.length - 1 && <div style={{ width: '22px', height: '1px', background: '#e2e8f0' }} />}
-              </React.Fragment>
-            );
-          })}
-        </div>
-
-        {/* STEP 1 — Purpose + mode + domain classification */}
-        {inviteStep === 1 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px 14px', background: 'white' }}>
-                <span style={radio(false)} /><span style={{ fontSize: '13px', color: '#475569' }}>Select recommended partner</span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', border: '2px solid #F97316', borderRadius: '8px', padding: '12px 14px', background: '#fff7ed' }}>
-                <span style={radio(true)} /><span style={{ fontSize: '13px', color: '#1e293b', fontWeight: '600' }}>Invite a new partner</span>
-              </div>
-            </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-              <div><label style={fieldLabel}>Partner Company Name</label><div style={fieldBox}>Stratosphere IT</div></div>
-              <div><label style={fieldLabel}>Contact Email Address</label><div style={fieldBox}>mike@stratosphere-it.example</div></div>
-            </div>
-            {/* Domain-classification preview (live = Case C) */}
-            <div style={{ border: '1px solid #e9d5ff', background: 'linear-gradient(135deg,#faf5ff,#f3e8ff)', borderRadius: '8px', padding: '14px 16px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-                <span style={{ fontSize: '15px' }}>✦</span>
-                <span style={{ fontSize: '13px', fontWeight: '700', color: '#7C3AED' }}>Stratosphere IT</span>
-                {['AWS', 'Azure'].map(c => <span key={c} style={{ fontSize: '10px', fontWeight: '600', padding: '2px 6px', borderRadius: '4px', background: channelColors[c].bg, color: channelColors[c].color }}>{c}</span>)}
-              </div>
-              <div style={{ fontSize: '12px', color: '#6b21a8' }}>We recognise this partner as a marketplace reseller on the channels above.</div>
-            </div>
-            <div style={{ fontSize: '11px', color: '#94a3b8' }}>Detected from the email domain: <strong>A</strong> existing Suger customer · <strong>B</strong> new (direct) · <strong style={{ color: '#7C3AED' }}>C known reseller ✓</strong></div>
-          </div>
-        )}
-
-        {/* STEP 2 — Context */}
-        {inviteStep === 2 && (
-          <div>
-            <label style={fieldLabel}>Context about your collaboration goals (optional)</label>
-            <div style={{ ...fieldBox, minHeight: '96px', color: '#475569', lineHeight: '1.6' }}>We share 14 accounts in financial services and see strong co-sell potential on AWS. Would love to align on joint pipeline for FY26.</div>
-          </div>
-        )}
-
-        {/* STEP 3 — Tone */}
-        {inviteStep === 3 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {[['Professional', true], ['Casual', false], ['Custom', false]].map(([t, on]) => (
-              <div key={t} style={{ display: 'flex', alignItems: 'center', gap: '10px', border: on ? '2px solid #F97316' : '1px solid #e2e8f0', background: on ? '#fff7ed' : 'white', borderRadius: '8px', padding: '12px 14px' }}>
-                <span style={radio(on)} /><span style={{ fontSize: '13px', color: on ? '#1e293b' : '#475569', fontWeight: on ? '600' : '400' }}>{t}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* STEP 4 — AI-drafted email */}
-        {inviteStep === 4 && (
-          <div style={{ background: 'linear-gradient(135deg, #faf5ff, #f3e8ff)', border: '1px solid #e9d5ff', borderRadius: '8px', padding: '16px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-              <span style={{ fontSize: '16px' }}>✦</span>
-              <span style={{ fontSize: '13px', fontWeight: '600', color: '#7C3AED' }}>AI-drafted email</span>
-              <span style={{ display: 'inline-flex', gap: '3px' }}>
-                {[0, 1, 2].map(i => <span key={i} style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#A855F7', opacity: 0.5 + (i * 0.15), animation: `fadeIn 1.4s ease-in-out ${i * 0.2}s infinite alternate` }} />)}
-              </span>
-            </div>
-            <div style={{ fontSize: '11px', color: '#6b21a8', marginBottom: '8px' }}>Subject: Partnering on shared AWS accounts</div>
-            <div style={{ background: 'white', border: '1px solid #e9d5ff', borderRadius: '6px', padding: '16px', fontSize: '13px', color: '#1e293b', lineHeight: '1.7' }}>
-              <div style={{ marginBottom: '10px' }}>Hi Mike,</div>
-              <div style={{ marginBottom: '10px' }}>I noticed we share <strong>14 accounts</strong> — particularly in financial services, which aligns closely with your team's expertise.</div>
-              <div style={{ marginBottom: '10px' }}>With your <strong>AWS Advanced Tier</strong> status, there's a real opportunity to collaborate on co-sell motions around these shared customers.</div>
-              <div>Looking forward to hearing from you,<br />Samantha</div>
-            </div>
-          </div>
-        )}
-
-        {/* STEP 5 — Review */}
-        {inviteStep === 5 && (
-          <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '18px' }}>
-            <div style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>Review &amp; send</div>
-            {[['Partner', 'Stratosphere IT (new · reseller)'], ['Purpose', 'Account Overlap'], ['Recipient', 'mike@stratosphere-it.example'], ['Tone', 'Professional']].map(([k, v]) => (
-              <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f1f5f9', fontSize: '13px' }}>
-                <span style={{ color: '#64748b' }}>{k}</span><span style={{ color: '#1e293b', fontWeight: '500' }}>{v}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* SENT confirmation */}
-        {inviteStep === 6 && (
-          <div>
-            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
-              <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#DCFCE7', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px', marginBottom: '12px' }}>✓</div>
-              <div style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '4px' }}>Invitation sent to Stratosphere IT</div>
-              <div style={{ fontSize: '13px', color: '#64748b' }}>It'll appear under Collaborations → Threads as an outbound invite.</div>
-            </div>
-            <button onClick={() => { setInviteStep(1); setDiscoveryStep('list'); setActiveTab('discovery'); }} style={{ background: 'white', color: '#1e293b', fontSize: '13px', fontWeight: '500', padding: '10px 18px', borderRadius: '6px', border: '1px solid #e2e8f0', cursor: 'pointer' }}>← Back to Discovery</button>
-          </div>
-        )}
-
-        {/* Wizard footer nav */}
-        {inviteStep <= 5 && (
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
-            <button onClick={() => setInviteStep(Math.max(1, inviteStep - 1))} disabled={inviteStep === 1}
-              style={{ background: 'white', color: inviteStep === 1 ? '#cbd5e1' : '#1e293b', fontSize: '13px', fontWeight: '500', padding: '9px 18px', borderRadius: '6px', border: '1px solid #e2e8f0', cursor: inviteStep === 1 ? 'default' : 'pointer' }}>Back</button>
-            <button onClick={() => setInviteStep(inviteStep + 1)}
-              style={{ background: '#F97316', color: 'white', fontSize: '13px', fontWeight: '600', padding: '9px 20px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>{inviteStep === 5 ? 'Send ↗' : 'Next'}</button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-
-  const threads = [
-    { partner: 'CloudSync Solutions', type: 'Account Overlap', subject: 'Partnering on shared AWS accounts', accounts: 'Acme Corp +3', state: 'Accepted', dir: 'Outbound', recipient: 'dana@cloudsync.example', created: 'Jun 2' },
-    { partner: 'Stratosphere IT', type: 'Account Overlap', subject: 'Co-sell on financial services book', accounts: 'Northwind +13', state: 'Sent', dir: 'Outbound', recipient: 'mike@stratosphere-it.example', created: 'Just now' },
-    { partner: 'NexGen Consulting', type: 'Deal Collaboration', subject: 'Joint pursuit — Globex migration', accounts: 'Globex', state: 'Accepted', dir: 'Inbound', recipient: 'you@yourco.example', created: 'May 28' },
-    { partner: 'DataBridge Partners', type: 'Network Invitation', subject: 'Intro — partner network', accounts: 'Stark Systems', state: 'Declined', dir: 'Outbound', recipient: 'ops@databridge.example', created: 'May 20' },
-    { partner: 'Meridian Software', type: 'Account Overlap', subject: 'Overlap on Wayne Retail', accounts: 'Wayne Retail', state: 'Accepted', dir: 'Inbound', recipient: 'you@yourco.example', created: 'May 15' },
-  ];
-
-  const stateStyle = (s) => (
-    s === 'Accepted' ? { color: '#166534', bg: '#DCFCE7' } :
-    s === 'Sent' ? { color: '#92400E', bg: '#FEF3C7' } :
-    { color: '#991B1B', bg: '#FEE2E2' }
-  );
-  const dirStyle = (d) => (d === 'Inbound' ? { color: '#0369A1', bg: '#E0F2FE' } : { color: '#475569', bg: '#F1F5F9' });
-
-  const renderCollab = () => (
-    <div style={{ background: '#f8fafc' }}>
-      <NavBar />
-      <SubTabs active="collab" />
-      <div style={{ padding: '24px' }}>
-        {/* Threads / Pending Invitations sub-tabs */}
-        <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid #e2e8f0', marginBottom: '16px' }}>
-          <div style={{ padding: '8px 0', fontSize: '13px', fontWeight: '600', color: '#1e293b', borderBottom: '2px solid #F97316', display: 'flex', gap: '6px', alignItems: 'center' }}>Threads <span style={{ fontSize: '10px', background: '#e2e8f0', color: '#64748b', padding: '1px 6px', borderRadius: '100px' }}>5</span></div>
-          <div style={{ padding: '8px 0', fontSize: '13px', color: '#64748b', display: 'flex', gap: '6px', alignItems: 'center' }}>Pending Invitations <span style={{ fontSize: '10px', background: '#e2e8f0', color: '#64748b', padding: '1px 6px', borderRadius: '100px' }}>1</span></div>
-        </div>
-        {/* Threads table */}
-        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1.6fr 0.8fr 0.9fr 1.3fr 0.7fr 32px', gap: '8px', padding: '10px 14px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-            {['Partner', 'Type', 'Subject', 'State', 'Direction', 'Recipient', 'Created', ''].map(h => (
-              <div key={h} style={{ fontSize: '9px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</div>
-            ))}
-          </div>
-          {threads.map((t, i) => {
-            const st = stateStyle(t.state); const dr = dirStyle(t.dir);
-            return (
-              <div key={i} style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1.6fr 0.8fr 0.9fr 1.3fr 0.7fr 32px', gap: '8px', padding: '11px 14px', borderBottom: i < threads.length - 1 ? '1px solid #f1f5f9' : 'none', alignItems: 'center' }}>
-                <div style={{ fontSize: '12px', fontWeight: '600', color: '#1e293b' }}>{t.partner}</div>
-                <div style={{ fontSize: '11px', color: '#64748b' }}>{t.type}</div>
-                <div style={{ fontSize: '11px', color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.subject}</div>
-                <div><span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '100px', background: st.bg, color: st.color }}>{t.state}</span></div>
-                <div><span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '100px', background: dr.bg, color: dr.color }}>{t.dir}</span></div>
-                <div style={{ fontSize: '11px', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.recipient}</div>
-                <div style={{ fontSize: '11px', color: '#64748b' }}>{t.created}</div>
-                <div style={{ fontSize: '13px', color: '#94a3b8', textAlign: 'center' }}>👁</div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-
-  const frameContent =
-    activeTab === 'discovery' && discoveryStep === 'list' ? renderDiscoveryList() :
-    activeTab === 'discovery' && discoveryStep === 'invite' ? renderInviteFlow() :
-    activeTab === 'invite' ? renderInviteFlow() :
-    renderCollab();
 
   return (
     <Section id="prototype" label="06 · Prototype — Partner Discovery & Collaborations">
@@ -862,11 +595,7 @@ function PartnerDiscoverySection() {
           return (
             <button
               key={tab.id}
-              onClick={() => {
-                setActiveTab(tab.id);
-                if (tab.id !== 'invite') setInviteStep(1);
-                if (tab.id === 'discovery') setDiscoveryStep('list');
-              }}
+              onClick={() => setActiveTab(tab.id)}
               style={{
                 padding: '9px 16px',
                 borderRadius: '100px',
@@ -886,14 +615,7 @@ function PartnerDiscoverySection() {
         })}
       </div>
 
-      <div style={{
-        border: '1px solid var(--border)',
-        borderRadius: '12px',
-        overflow: 'hidden',
-        boxShadow: '0 12px 40px rgba(62,42,31,0.08)',
-      }}>
-        {frameContent}
-      </div>
+      {frameContent}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '32px' }}>
         <Callout label="AI Design Decision">
@@ -1006,156 +728,8 @@ function SugerCaseStudy() {
               <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '4px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginLeft: '4px' }}>console.suger.io/partners</div>
               <span style={{ background: '#F97316', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '100px' }}>PrimeOne DS</span>
             </div>
-            <div style={{ background: '#f8fafc', padding: 0, width: '100%' }}>
-              {/* Top nav */}
-              <div style={{ background: '#1a1a2e', padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                  <div style={{ fontSize: '12px', fontWeight: '700', color: 'white' }}>suger</div>
-                  <div style={{ display: 'flex', gap: '12px' }}>
-                    {['Home', 'Marketplace', 'Co-Sell', 'Offers', 'Partners', 'Contacts'].map(l => (
-                      <span key={l} style={{ fontSize: '10px', color: l === 'Partners' ? 'white' : '#94a3b8', fontWeight: l === 'Partners' ? '600' : '400' }}>{l}</span>
-                    ))}
-                  </div>
-                </div>
-                <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#F97316', fontSize: '9px', color: 'white', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>JD</div>
-              </div>
-
-              {/* Alert banner */}
-              <div style={{ background: '#fffbeb', borderBottom: '1px solid #fde68a', padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <span style={{ fontSize: '11px', color: '#d97706', marginRight: '6px' }}>⚠</span>
-                  <span style={{ fontSize: '10px', color: '#92400e' }}>6 items need attention: 4 co-sell invites, 2 deal registrations</span>
-                </div>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {['View Invites', 'View Registrations'].map(b => (
-                    <button key={b} style={{ fontSize: '9px', border: '1px solid #d97706', color: '#d97706', background: 'transparent', padding: '2px 8px', borderRadius: '4px', cursor: 'pointer' }}>{b}</button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Page header */}
-              <div style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div>
-                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>Partners</div>
-                  <div style={{ fontSize: '9px', color: '#64748b' }}>Manage your partner ecosystem and track performance</div>
-                </div>
-                <div style={{ display: 'flex', gap: '6px' }}>
-                  {['Tasks', 'Partner Files', 'Training'].map(b => (
-                    <button key={b} style={{ border: '1px solid #e2e8f0', fontSize: '9px', color: '#64748b', padding: '4px 10px', borderRadius: '4px', background: 'white', cursor: 'pointer' }}>{b}</button>
-                  ))}
-                  <button style={{ background: '#F97316', color: 'white', fontSize: '9px', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>+ Invite Partner</button>
-                </div>
-              </div>
-
-              {/* KPI cards */}
-              <div style={{ padding: '0 12px 8px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-                {[
-                  { label: 'ACTIVE PARTNERS', value: '15', delta: '+3% vs prior period' },
-                  { label: 'PARTNER-INFLUENCED PIPELINE', value: '$1.8M', delta: '+15%' },
-                  { label: 'PARTNER-SOURCED REVENUE', value: '$1.3M', delta: '+8%' },
-                ].map(k => (
-                  <div key={k.label} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '8px 10px' }}>
-                    <div style={{ fontSize: '8px', color: '#64748b', letterSpacing: '0.05em' }}>{k.label}</div>
-                    <div style={{ fontSize: '18px', fontWeight: '700', color: '#1e293b' }}>{k.value}</div>
-                    <div style={{ fontSize: '9px', color: '#16a34a' }}>{k.delta}</div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Charts row */}
-              <div style={{ padding: '0 12px 8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>Leading Partners by Revenue</div>
-                  {[
-                    { name: 'Stratosphere IT', width: '85%', value: '$4.2M' },
-                    { name: 'CloudSync', width: '70%', value: '$2.5M' },
-                    { name: 'NexGen', width: '65%', value: '$3.1M' },
-                    { name: 'TerraForm', width: '45%', value: '$2.8M' },
-                    { name: 'DataBridge', width: '40%', value: '$1.9M' },
-                  ].map(b => (
-                    <div key={b.name} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
-                      <div style={{ fontSize: '9px', color: '#64748b', width: '80px', flexShrink: 0 }}>{b.name}</div>
-                      <div style={{ height: '8px', borderRadius: '4px', background: '#2D1B69', width: b.width }} />
-                      <div style={{ fontSize: '9px', color: '#1e293b' }}>{b.value}</div>
-                    </div>
-                  ))}
-                </div>
-                <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
-                  <div style={{ fontSize: '10px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>Pipeline at Risk</div>
-                  <div style={{ fontSize: '8px', color: '#64748b', marginBottom: '8px' }}>Co-sells with 30+ days of no activity</div>
-                  {[
-                    { deal: 'Acme Migration', partner: 'Stratosphere IT', days: '45 days' },
-                    { deal: 'HealthNet Deal', partner: 'NexGen', days: '38 days' },
-                    { deal: 'Retail AI Project', partner: 'CloudSync', days: '32 days' },
-                  ].map(r => (
-                    <div key={r.deal} style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '4px', padding: '6px 8px', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <div>
-                        <div style={{ fontSize: '9px', fontWeight: '600', color: '#1e293b' }}>{r.deal}</div>
-                        <div style={{ fontSize: '8px', color: '#64748b' }}>{r.partner}</div>
-                      </div>
-                      <div style={{ fontSize: '9px', fontWeight: '700', color: '#ea580c' }}>{r.days}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Recent activity */}
-              <div style={{ padding: '0 16px 12px' }}>
-                <div style={{ fontSize: '10px', fontWeight: '600', color: '#1e293b', marginBottom: '6px' }}>Recent Activity</div>
-                {[
-                  { dot: '#16a34a', text: 'Co-Sell Won — TechStart SaaS Expansion closed — $95K', meta: 'CloudSync Solutions · Yesterday' },
-                  { dot: '#d97706', text: 'Deal Registered — Bolt Cloud Migration — $175K (Pending)', meta: 'CloudSync · 2 days ago' },
-                  { dot: '#ea580c', text: 'Co-Sell Tagged — Vertex AI Workloads tagged — $340K', meta: 'Stratosphere IT · 2 days ago' },
-                ].map((a, i) => (
-                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0' }}>
-                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: a.dot, flexShrink: 0 }} />
-                    <span style={{ fontSize: '9px', color: '#1e293b' }}>{a.text}</span>
-                    <span style={{ fontSize: '8px', color: '#64748b', marginLeft: 'auto' }}>{a.meta}</span>
-                  </div>
-                ))}
-              </div>
-
-              {/* Partners list tabs */}
-              <div style={{ padding: '0 16px 6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                {[
-                  { label: 'All Partners', active: true },
-                  { label: 'Partner Discovery', active: false },
-                  { label: 'Collaborations 6', active: false },
-                  { label: 'Partner Co-Sells', active: false },
-                ].map(t => (
-                  <span key={t.label} style={{ background: t.active ? '#1e293b' : '#f1f5f9', color: t.active ? 'white' : '#64748b', fontSize: '9px', fontWeight: '600', padding: '4px 10px', borderRadius: '100px' }}>{t.label}</span>
-                ))}
-              </div>
-
-              {/* Partners table */}
-              <div style={{ padding: '0 16px 12px' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.8fr 0.9fr 0.9fr 1fr 0.8fr 0.8fr 0.7fr', gap: '8px', padding: '6px 0', borderBottom: '1px solid #e2e8f0' }}>
-                  {['Partner Name', 'Connected', 'Partner Types', 'Channels', 'Partner Manager', 'Total Rev', 'Upcoming', 'Last Activity'].map(h => (
-                    <div key={h} style={{ fontSize: '8px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>{h}</div>
-                  ))}
-                </div>
-                {[
-                  { name: 'CloudSync Solutions', type: 'RESELLER', connected: true, channels: ['AWS', 'Azure'], mgr: 'Jane Doe', total: '$2.5M', up: '$420K', last: 'Jun 17' },
-                  { name: 'DataBridge Partners', type: 'SI', connected: true, channels: ['AWS'], mgr: 'Sam Lee', total: '$1.9M', up: '$180K', last: 'Jun 14' },
-                  { name: 'NexGen Consulting', type: 'SI', connected: false, channels: ['Azure', 'GCP'], mgr: 'Jane Doe', total: '$3.1M', up: '$560K', last: 'Jun 18' },
-                ].map(p => (
-                  <div key={p.name} style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.8fr 0.9fr 0.9fr 1fr 0.8fr 0.8fr 0.7fr', gap: '8px', padding: '8px 0', borderBottom: '1px solid #f1f5f9', alignItems: 'center' }}>
-                    <div style={{ fontSize: '10px', fontWeight: '600', color: '#1e293b' }}>{p.name}</div>
-                    <div style={{ fontSize: '9px', fontWeight: '600', color: p.connected ? '#16a34a' : '#94a3b8' }}>{p.connected ? '✓ Connected' : '—'}</div>
-                    <div><span style={{ fontSize: '8px', fontWeight: '600', background: '#f1f5f9', color: '#64748b', padding: '1px 6px', borderRadius: '100px' }}>{p.type}</span></div>
-                    <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap' }}>
-                      {p.channels.map(c => {
-                        const s = c === 'AWS' ? { bg: '#fff3e0', color: '#FF9900' } : c === 'Azure' ? { bg: '#e3f2ff', color: '#0078D4' } : { bg: '#e8f0fe', color: '#4285F4' };
-                        return <span key={c} style={{ background: s.bg, color: s.color, fontSize: '8px', padding: '1px 5px', borderRadius: '3px' }}>{c}</span>;
-                      })}
-                    </div>
-                    <div style={{ fontSize: '9px', color: '#64748b' }}>{p.mgr}</div>
-                    <div style={{ fontSize: '10px', fontWeight: '600', color: '#1e293b' }}>{p.total}</div>
-                    <div style={{ fontSize: '9px', color: '#64748b' }}>{p.up}</div>
-                    <div style={{ fontSize: '9px', color: '#64748b' }}>{p.last}</div>
-                  </div>
-                ))}
-              </div>
+            <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', background: '#f8fafc' }}>
+              <video src={`${PRM_VID}/dashboard.mp4`} autoPlay loop muted playsInline preload="metadata" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} />
             </div>
             <a href="https://suger-prm.lovable.app" target="_blank" rel="noreferrer" style={{ background: '#F97316', padding: '10px 16px', textAlign: 'center', fontSize: '11px', fontWeight: '600', color: 'white', display: 'block', textDecoration: 'none', width: '100%' }}>↗ View the early Lovable prototype</a>
           </div>
