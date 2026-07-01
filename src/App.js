@@ -1,12 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
+import TaxManagementCaseStudy from './TaxManagementCaseStudy';
+import { CaseStudyNav } from './caseStudyNav';
 
 // ── GLOBAL STYLES ──────────────────────────────────────────
 const globalStyles = `
+  @font-face {
+    font-family: 'Carlito';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url('/fonts/carlito-400.woff2') format('woff2');
+  }
+  @font-face {
+    font-family: 'Carlito';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url('/fonts/carlito-700.woff2') format('woff2');
+  }
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  
+
   :root {
     --bg: #FAF8F5;
+    --cs-bg: #FDFDFC;
     --ink: #3E2A1F;
     --ink-soft: #6B4E3D;
     --ink-muted: #A08B7A;
@@ -14,8 +32,8 @@ const globalStyles = `
     --accent-light: #E4EDE5;
     --border: #E8E3DC;
     --white: #FFFFFF;
-    --serif: 'Instrument Serif', Georgia, serif;
-    --sans: 'DM Sans', -apple-system, sans-serif;
+    --serif: 'Carlito', 'Calibri', 'Segoe UI', sans-serif;
+    --sans: 'Carlito', 'Calibri', 'Segoe UI', sans-serif;
   }
 
   html { scroll-behavior: smooth; }
@@ -54,6 +72,16 @@ const globalStyles = `
   .stagger-3 { animation-delay: 0.3s; opacity: 0; }
   .stagger-4 { animation-delay: 0.4s; opacity: 0; }
   .stagger-5 { animation-delay: 0.5s; opacity: 0; }
+
+  /* Case study: two-column body (sticky section nav + content) */
+  .cs-layout { display: flex; gap: 48px; align-items: flex-start; max-width: 1180px; margin: 0 auto; }
+  .cs-content { flex: 1; min-width: 0; max-width: 820px; }
+  .cs-nav { position: sticky; top: 96px; width: 190px; flex-shrink: 0; align-self: flex-start; }
+  @media (max-width: 1100px) {
+    .cs-nav { display: none; }
+    .cs-layout { display: block; }
+    .cs-content { max-width: 820px; margin: 0 auto; }
+  }
 `;
 
 // ── NAV ────────────────────────────────────────────────────
@@ -142,8 +170,20 @@ const projects = [
     live: true,
   },
   {
-    id: 'revvity',
+    id: 'tax-management',
     number: '02',
+    company: 'Suger · AI Product Designer · 2026',
+    title: 'Tax Management — Revenue-to-Tax Reconciliation',
+    subtitle: 'A 0→1 feature that audits whether every dollar of marketplace revenue is represented in the tax books — then explains the gaps and fixes the missing records with one click.',
+    tags: ['B2B SaaS', 'AI Features', 'Fintech / Tax', '0→1'],
+    color: '#1F4E46',
+    bgColor: '#E1EDE9',
+    link: '/case-study/tax-management',
+    live: true,
+  },
+  {
+    id: 'revvity',
+    number: '03',
     company: 'Revvity · Product Designer · 2024',
     title: 'Redesigning Revvity\'s Homogenizer Workstation',
     subtitle: 'Streamlined a complex lab workflow, cutting implementation time by 68% and increasing team efficiency by 1.5×.',
@@ -155,7 +195,7 @@ const projects = [
   },
   {
     id: 'crypto',
-    number: '03',
+    number: '04',
     company: 'Crypto Arsenal · UX Designer · 2023',
     title: 'Redesigning a Crypto Trading Dashboard',
     subtitle: 'Smarter source input for TradingView. Improved workflow efficiency by 15% through data visualization and user flow optimization.',
@@ -167,7 +207,7 @@ const projects = [
   },
   {
     id: 'greenpeace',
-    number: '04',
+    number: '05',
     company: 'Greenpeace · UX Designer · 2024',
     title: 'Greenpeace Ambassador Program',
     subtitle: 'Pitched a volunteer-to-ambassador journey with a self-serve digital approval flow, backed by a 22-page service design blueprint.',
@@ -420,9 +460,9 @@ function AboutPage() {
 }
 
 // ── CASE STUDY PAGE ────────────────────────────────────────
-function Section({ label, children, style }) {
+function Section({ label, children, style, id }) {
   return (
-    <section style={{ marginBottom: '80px', ...style }}>
+    <section id={id} style={{ marginBottom: '80px', scrollMarginTop: '88px', ...style }}>
       {label && (
         <div style={{
           fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em',
@@ -772,7 +812,7 @@ function PartnerDiscoverySection() {
     renderCollab();
 
   return (
-    <Section label="06 · Prototype — Partner Discovery & Collaborations">
+    <Section id="prototype" label="06 · Prototype — Partner Discovery & Collaborations">
       <H2>Designing for partner discovery and AI-assisted outreach</H2>
       <Body>
         Two prototypes ship alongside the core PRM: a Partner Discovery surface that ranks candidate partners by account overlap and channel fit, and an AI-drafted outreach flow that turns "I should reach out" into a one-click invite. The Collaborations tab reflects the state after partners accept — shared accounts auto-map and activity flows into the main dashboard.
@@ -836,6 +876,45 @@ function PartnerDiscoverySection() {
         </div>
       </div>
 
+      {/* Invite intelligence — domain classification + data-integrity decisions */}
+      <div style={{ marginTop: '32px' }}>
+        <h3 style={{ fontFamily: 'var(--serif)', fontSize: '22px', marginBottom: '12px', color: 'var(--ink)' }}>One invite button, three cases</h3>
+        <Body>An invite isn't just an email — it can link two organizations together. So as the seller types a contact email, the system quietly classifies the domain, and provisions the partnership correctly only once the partner accepts.</Body>
+        <div style={{ margin: '20px 0', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '70px 1fr 1.2fr', background: 'var(--ink)', padding: '10px 14px' }}>
+            {['Case', 'The domain is…', 'What happens on acceptance'].map(h => (
+              <div key={h} style={{ fontSize: '11px', fontWeight: '600', color: 'rgba(255,255,255,0.7)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{h}</div>
+            ))}
+          </div>
+          {[
+            { c: 'A', domain: 'An existing Suger org', out: 'Paired inbound + outbound invites; both orgs get linked partnerships' },
+            { c: 'B', domain: 'Brand-new / unknown', out: 'A "shadow org" is created; channel tagged "Direct"' },
+            { c: 'C', domain: 'A known marketplace reseller', out: 'Partnership tagged with the real marketplace channel(s), not "Direct"' },
+          ].map((r, i) => (
+            <div key={r.c} style={{ display: 'grid', gridTemplateColumns: '70px 1fr 1.2fr', padding: '12px 14px', background: i % 2 === 0 ? 'var(--white)' : 'var(--bg)', borderTop: '1px solid var(--border)', alignItems: 'center' }}>
+              <div style={{ fontSize: '16px', fontWeight: '700', color: 'var(--accent)', fontFamily: 'var(--serif)' }}>{r.c}</div>
+              <div style={{ fontSize: '13px', color: 'var(--ink)', fontWeight: '600', paddingRight: '12px' }}>{r.domain}</div>
+              <div style={{ fontSize: '13px', color: 'var(--ink-soft)', lineHeight: '1.6' }}>{r.out}</div>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '8px' }}>
+          <Callout label="Product decision">Create nothing until acceptance. Sending only writes an invitation — the partnership is provisioned when the partner accepts, so the partner list never fills with speculative relationships that never happened.</Callout>
+          <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px' }}>
+            <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '12px' }}>Invisible decisions that protect the data</div>
+            {[
+              'Server-side truth over client guesses — the invite is stamped with the server\'s classification and re-checked at accept time',
+              'Idempotent, union-merge sync — a nightly job never clobbers channels a human set; re-running it changes nothing',
+              'Killed status drift — normalized invitation status to one Title-Case vocabulary across the whole stack',
+            ].map(d => (
+              <div key={d} style={{ display: 'flex', gap: '10px', fontSize: '13px', color: 'var(--ink-soft)', lineHeight: '1.55', marginBottom: '8px' }}>
+                <span style={{ color: 'var(--accent)', flexShrink: 0 }}>—</span><span>{d}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div style={{
         background: '#1a1a2e',
         borderRadius: '12px',
@@ -848,33 +927,46 @@ function PartnerDiscoverySection() {
         gap: '16px',
       }}>
         <div style={{ color: 'white', fontSize: '15px', fontWeight: '500' }}>
-          Explore the full PRM prototype in Lovable ↗
+          Prototyped in Lovable, then rebuilt in-product ↗
         </div>
         <a href="https://suger-prm.lovable.app" target="_blank" rel="noreferrer" style={{
           background: '#F97316', color: 'white', fontSize: '13px', fontWeight: '600',
           padding: '10px 20px', borderRadius: '100px',
           display: 'inline-flex', alignItems: 'center', gap: '6px',
         }}>
-          Open Prototype ↗
+          Early prototype ↗
         </a>
       </div>
     </Section>
   );
 }
 
+const PRM_SECTIONS = [
+  { id: 'context', label: 'Context' },
+  { id: 'problem', label: 'Problem' },
+  { id: 'discovery', label: 'Discovery' },
+  { id: 'contact-list', label: 'Contact List' },
+  { id: 'prm', label: 'PRM' },
+  { id: 'prototype', label: 'Prototype' },
+  { id: 'system', label: 'System' },
+  { id: 'impact', label: 'Impact' },
+  { id: 'ai-tools', label: 'AI Tools' },
+  { id: 'reflection', label: 'Reflection' },
+];
+
 function SugerCaseStudy() {
   return (
-    <div style={{ paddingTop: '100px', '--accent': '#4A3222', '--accent-light': '#EDE5D8' }}>
+    <div style={{ paddingTop: '100px', minHeight: '100vh', background: 'var(--cs-bg)', '--accent': '#4A3222', '--accent-light': '#EDE5D8' }}>
       {/* Hero */}
-      <div style={{ position: 'relative', overflow: 'hidden', background: '#FAF8F5', borderBottom: '1px solid var(--border)', padding: '120px 40px 0', paddingTop: '120px' }}>
+      <div style={{ position: 'relative', overflow: 'hidden', background: 'var(--cs-bg)', borderBottom: '1px solid var(--border)', padding: '120px 40px 0', paddingTop: '120px' }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', flexDirection: 'column-reverse', gap: 0 }}>
           <div style={{ position: 'relative', borderRadius: '12px 12px 0 0', overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.12)', width: '100%', maxWidth: '760px', margin: '0 auto' }}>
             <div style={{ background: '#1a1a2e', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
               <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
               <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#22c55e' }} />
-              <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '4px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginLeft: '4px' }}>suger-prm.lovable.app</div>
-              <span style={{ background: '#F97316', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '100px' }}>Live ↗</span>
+              <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '4px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginLeft: '4px' }}>console.suger.io/partners</div>
+              <span style={{ background: '#F97316', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '100px' }}>PrimeOne DS</span>
             </div>
             <div style={{ background: '#f8fafc', padding: 0, width: '100%' }}>
               {/* Top nav */}
@@ -1028,7 +1120,7 @@ function SugerCaseStudy() {
                 ))}
               </div>
             </div>
-            <a href="https://suger-prm.lovable.app" target="_blank" rel="noreferrer" style={{ background: '#F97316', padding: '10px 16px', textAlign: 'center', fontSize: '11px', fontWeight: '600', color: 'white', display: 'block', textDecoration: 'none', width: '100%' }}>↗ View full prototype</a>
+            <a href="https://suger-prm.lovable.app" target="_blank" rel="noreferrer" style={{ background: '#F97316', padding: '10px 16px', textAlign: 'center', fontSize: '11px', fontWeight: '600', color: 'white', display: 'block', textDecoration: 'none', width: '100%' }}>↗ View the early Lovable prototype</a>
           </div>
 
           <div style={{ paddingTop: '48px', paddingBottom: '80px', maxWidth: '680px', margin: '0 auto', textAlign: 'center' }}>
@@ -1039,7 +1131,7 @@ function SugerCaseStudy() {
             </div>
             <h1 className="fade-up stagger-2" style={{
               fontFamily: 'var(--serif)', fontSize: 'clamp(36px, 4.5vw, 52px)',
-              fontStyle: 'italic', lineHeight: '1.1', color: 'var(--ink)', marginBottom: '20px',
+              lineHeight: '1.1', color: 'var(--ink)', marginBottom: '20px',
             }}>
               Suger Partner Intelligence System
             </h1>
@@ -1056,7 +1148,7 @@ function SugerCaseStudy() {
               <span style={{ color: 'var(--ink-muted)' }}>→</span>
               <span style={{ fontSize: '12px', fontWeight: '600', padding: '6px 14px', borderRadius: '100px', background: 'var(--accent)', color: 'white' }}>AI Relationship Layer</span>
             </div>
-            <div style={{ fontSize: '12px', color: 'var(--ink-muted)', fontStyle: 'italic', marginTop: '8px' }}>The scope expanded as the design revealed a bigger opportunity</div>
+            <div style={{ fontSize: '12px', color: 'var(--ink-muted)', marginTop: '8px' }}>The scope expanded as the design revealed a bigger opportunity</div>
           </div>
         </div>
       </div>
@@ -1082,16 +1174,19 @@ function SugerCaseStudy() {
       </div>
 
       {/* Body */}
-      <div style={{ maxWidth: '900px', margin: '0 auto', padding: '80px 40px' }}>
+      <div style={{ padding: '80px 40px' }}>
+        <div className="cs-layout">
+          <CaseStudyNav sections={PRM_SECTIONS} />
+          <div className="cs-content">
 
         {/* Context */}
-        <Section label="01 · Context">
+        <Section id="context" label="01 · Context">
           <H2>It started with a contact list</H2>
           <Body>I was brought onto Suger's co-sell console to solve a straightforward problem: sellers couldn't find the right person to contact at AWS, Azure, or GCP. They were guessing at names, submitting referrals to the wrong reps, and losing deals before they started.</Body>
           <Body>So I designed Contact List — an AI-powered surface that surfaced predicted cloud contacts based on historical co-sell data, account coverage, and domain associations. It shipped. Sellers started using it.</Body>
           <Body>But as I watched how sellers actually used Contact List, a bigger pattern emerged. Finding the right contact was only the first step. After the call, sellers had no way to track what happened — no unified view of the partner relationship, no way to attribute revenue, no way to know which partners were worth doubling down on. The data existed in Suger. It was just scattered.</Body>
           <Callout label="The pivot">Contact List was a feature. What sellers actually needed was a partner intelligence system. That realization turned a contact table into the foundation for PRM.</Callout>
-          <div style={{ fontSize: '14px', color: 'var(--ink-muted)', fontStyle: 'italic', margin: '16px 0 0' }}>This case study covers both: Contact List (shipped) and PRM Phase 1 (in development).</div>
+          <div style={{ fontSize: '14px', color: 'var(--ink-muted)', margin: '16px 0 0' }}>This case study covers both: Contact List (shipped) and PRM Phase 1 (in development).</div>
 
           <div style={{ background: 'var(--bg)', borderRadius: '12px', border: '1px solid var(--border)', padding: '24px', margin: '32px 0' }}>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 32px 1.1fr 32px 1fr', gap: '12px', alignItems: 'stretch' }}>
@@ -1137,7 +1232,7 @@ function SugerCaseStudy() {
         </Section>
 
         {/* Problem */}
-        <Section label="02 · The Problem">
+        <Section id="problem" label="02 · The Problem">
           <H2>From deal-level to partner-level thinking</H2>
 
           <div style={{ marginBottom: '32px' }}>
@@ -1181,7 +1276,7 @@ function SugerCaseStudy() {
         </Section>
 
         {/* Discovery */}
-        <Section label="03 · Discovery">
+        <Section id="discovery" label="03 · Discovery">
           <H2>Understanding the space before designing</H2>
           <Body>Before touching Figma, Gabriel (PM) and I researched how existing PRM tools approached these problems — and where they failed. We looked closely at Euler, Impartner, and Crossbeam/PartnerTap.</Body>
 
@@ -1225,7 +1320,7 @@ function SugerCaseStudy() {
         </Section>
 
         {/* Contact List */}
-        <Section label="04 · Design — Contact List">
+        <Section id="contact-list" label="04 · Design — Contact List">
           <H2>Solving the "who do I call?" problem</H2>
           <Body>Contact List was a new product surface I designed from scratch — a structured, filterable view of cloud contacts enriched with AI-predicted signals to help sellers identify the right person to engage for a specific deal.</Body>
           <Body>The core table handled three user types (cloud reps, buyers, and partners) with 14 columns: Name, Source, Role, Cloud Partner, Managed Domains, Industries, Owners, Region, Coverage Location, # of Accounts, Open Pipeline, Closed Won, Success Rate, and Last Updated.</Body>
@@ -1307,7 +1402,7 @@ function SugerCaseStudy() {
         </Section>
 
         {/* PRM */}
-        <Section label="05 · Design — Partner Relationship Management">
+        <Section id="prm" label="05 · Design — Partner Relationship Management">
           <H2>Organizing data by partner, not by transaction type</H2>
           <Body>PRM Phase 1 was the bigger design challenge — not because individual components were complex, but because the architectural decision about how to organize partner data would shape every surface downstream.</Body>
 
@@ -1403,30 +1498,21 @@ function SugerCaseStudy() {
             <div style={{ fontSize: '12px', color: 'var(--ink-muted)', textAlign: 'center', marginTop: '8px' }}>Partner Profile — Revenue metrics, AI overview, and basic information panel</div>
           </div>
 
-          {/* Prototype link */}
-          <div style={{
-            background: 'var(--accent)', borderRadius: '12px', padding: '32px',
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px',
-          }}>
-            <div>
-              <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', marginBottom: '8px' }}>Interactive Prototype</div>
-              <div style={{ fontFamily: 'var(--serif)', fontSize: '20px', color: 'white', marginBottom: '8px' }}>PRM Phase 1 — Lovable Prototype</div>
-              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)' }}>Structure validated in Lovable. Final implementation in PrimeOne design system.</div>
+          {/* Prototype → Production transition */}
+          <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--ink)', marginBottom: '16px' }}>From early prototype to production</div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 40px 1fr', gap: '12px', alignItems: 'stretch' }}>
+            <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px' }}>
+              <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', color: 'var(--ink-muted)', textTransform: 'uppercase', marginBottom: '10px' }}>① Early · Lovable</div>
+              <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--ink)', marginBottom: '6px' }}>Structural prototype</div>
+              <div style={{ fontSize: '13px', color: 'var(--ink-soft)', lineHeight: '1.6', marginBottom: '14px' }}>I used Lovable to validate the information architecture and core flows fast — before committing to high-fidelity design.</div>
+              <a href="https://suger-prm.lovable.app" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: '600', color: 'var(--accent)' }}>View early prototype ↗</a>
             </div>
-            <a
-              href="https://preview--suger-prm.lovable.app"
-              target="_blank"
-              rel="noreferrer"
-              style={{
-                display: 'inline-flex', alignItems: 'center', gap: '8px',
-                background: '#1A4D2E', color: 'white',
-                padding: '12px 24px', borderRadius: '100px',
-                fontSize: '14px', fontWeight: '600',
-                flexShrink: 0,
-              }}
-            >
-              View Prototype ↗
-            </a>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', color: 'var(--ink-muted)' }}>→</div>
+            <div style={{ background: 'var(--accent)', borderRadius: '12px', padding: '24px', color: 'white' }}>
+              <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', color: 'rgba(255,255,255,0.7)', textTransform: 'uppercase', marginBottom: '10px' }}>② Now · Product repo</div>
+              <div style={{ fontSize: '15px', fontWeight: '700', color: 'white', marginBottom: '6px' }}>Rebuilt in the product</div>
+              <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.85)', lineHeight: '1.6' }}>The design then moved out of Lovable and into the Suger app itself, implemented on the <strong>PrimeOne design system</strong>. The screens throughout this case study reflect that production build.</div>
+            </div>
           </div>
         </Section>
 
@@ -1434,7 +1520,7 @@ function SugerCaseStudy() {
         <PartnerDiscoverySection />
 
         {/* The System */}
-        <Section label="07 · The System">
+        <Section id="system" label="07 · The System">
           <H2>How Contact List and PRM connect</H2>
           <Body>These weren't two separate projects. They're the same problem at different levels of abstraction.</Body>
 
@@ -1502,7 +1588,7 @@ function SugerCaseStudy() {
         </Section>
 
         {/* Impact */}
-        <Section label="08 · Impact">
+        <Section id="impact" label="08 · Impact">
           <H2>Design decisions that moved the needle</H2>
           <Body>PRM Phase 1 is in active development. Rather than projecting metrics, here are the concrete, defensible impacts of the design decisions themselves.</Body>
 
@@ -1514,7 +1600,7 @@ function SugerCaseStudy() {
               { symbol: '3', title: 'Interaction patterns reused across surfaces', desc: 'The Share Portal UX pattern built for Contact List was extended directly into PRM. The account mapping backend powers both contact predictions and partner shared accounts.' },
             ].map(({ symbol, title, desc }) => (
               <div key={title} style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '28px', display: 'grid', gridTemplateColumns: '80px 1fr', gap: '20px', alignItems: 'flex-start' }}>
-                <div style={{ fontFamily: 'var(--serif)', fontSize: '48px', color: 'var(--accent)', fontStyle: 'italic', lineHeight: '1' }}>{symbol}</div>
+                <div style={{ fontFamily: 'var(--serif)', fontSize: '48px', color: 'var(--accent)', lineHeight: '1' }}>{symbol}</div>
                 <div>
                   <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--ink)', marginBottom: '8px' }}>{title}</div>
                   <div style={{ fontSize: '13px', color: 'var(--ink-soft)', lineHeight: '1.6' }}>{desc}</div>
@@ -1538,7 +1624,7 @@ function SugerCaseStudy() {
         </Section>
 
         {/* AI Tools */}
-        <Section label="09 · AI in My Workflow">
+        <Section id="ai-tools" label="09 · AI in My Workflow">
           <H2>How I used AI tools throughout this project</H2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', margin: '24px 0' }}>
             {[
@@ -1558,7 +1644,7 @@ function SugerCaseStudy() {
         </Section>
 
         {/* Reflection */}
-        <Section label="10 · Reflection">
+        <Section id="reflection" label="10 · Reflection">
           <H2>What I'd do differently</H2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', margin: '24px 0' }}>
             {[
@@ -1586,6 +1672,8 @@ function SugerCaseStudy() {
             Next: Revvity Homogenizer →
           </a>
         </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1602,6 +1690,7 @@ export default function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/case-study/suger-prm" element={<SugerCaseStudy />} />
+          <Route path="/case-study/tax-management" element={<TaxManagementCaseStudy />} />
         </Routes>
       </BrowserRouter>
     </>
