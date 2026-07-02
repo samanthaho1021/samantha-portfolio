@@ -175,7 +175,7 @@ export default function NarrativeCaseStudy({ data }) {
       </div>
 
       {/* Body */}
-      <div style={{ padding: '80px 40px' }}>
+      <div className="cs-body">
         <div className="cs-layout">
           <CaseStudyNav sections={data.sections} />
           <div className="cs-content">

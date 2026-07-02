@@ -76,15 +76,19 @@ const globalStyles = `
   .stagger-5 { animation-delay: 0.5s; opacity: 0; }
 
   /* Case study: two-column body (sticky section nav + content) */
-  .cs-layout { display: flex; gap: 48px; align-items: flex-start; justify-content: center; max-width: 1280px; margin: 0 auto; }
-  .cs-content { flex: 0 1 800px; min-width: 0; }
+  .cs-body { padding: 80px 100px; }
+  .cs-layout { display: flex; gap: 48px; align-items: flex-start; }
+  .cs-content { flex: 1 1 auto; min-width: 0; }
   .cs-nav { position: sticky; top: 96px; width: 190px; flex: 0 0 190px; align-self: flex-start; }
   .cs-layout::after { content: ''; flex: 0 0 190px; }
   @media (max-width: 1100px) {
     .cs-nav { display: none; }
     .cs-layout { display: block; }
-    .cs-content { max-width: 800px; margin: 0 auto; }
+    .cs-content { max-width: none; }
     .cs-layout::after { display: none; }
+  }
+  @media (max-width: 900px) {
+    .cs-body { padding: 60px 24px; }
   }
 
   /* Home page: work cards grid */
@@ -1251,7 +1255,7 @@ function SugerCaseStudy() {
       </div>
 
       {/* Body */}
-      <div style={{ padding: '80px 40px' }}>
+      <div className="cs-body">
         <div className="cs-layout">
           <CaseStudyNav sections={PRM_SECTIONS} />
           <div className="cs-content">

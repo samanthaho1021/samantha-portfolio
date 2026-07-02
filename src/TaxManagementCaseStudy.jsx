@@ -204,7 +204,7 @@ export default function TaxManagementCaseStudy() {
       </div>
 
       {/* Body */}
-      <div style={{ padding: '80px 40px' }}>
+      <div className="cs-body">
         <div className="cs-layout">
           <CaseStudyNav sections={TAX_SECTIONS} />
           <div className="cs-content">
