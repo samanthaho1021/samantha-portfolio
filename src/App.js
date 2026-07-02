@@ -90,6 +90,12 @@ const globalStyles = `
   @media (max-width: 720px) {
     .work-grid { grid-template-columns: 1fr; }
   }
+
+  /* Case study: two-up comparison (before/after, image+prompts) */
+  .cs-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin: 24px 0; align-items: start; }
+  @media (max-width: 720px) {
+    .cs-2col { grid-template-columns: 1fr; }
+  }
 `;
 
 // ── NAV ────────────────────────────────────────────────────

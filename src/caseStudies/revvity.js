@@ -42,12 +42,28 @@ const revvity = {
     {
       id: 'ai',
       label: '02 · Exploring AI Tools',
+      dark: true,
       heading: 'I experimented with AI-generated wireframes to see how these tools could support my workflow.',
       blocks: [
-        { p: "Although I didn't use AI during the actual project, I was curious how well today's tools could handle a complex B2B workflow. I used Lovable to generate alternative wireframes for the method-creation interface and compared them against my own designs." },
-        { img: 'ai-lovable.jpg', cap: 'The Lovable interface, generating wireframes from prompts that recreated my workflow.' },
-        { video: 'ai-lovable-demo.mp4', cap: 'The Lovable prototype missed rack and probe configuration, and forced technicians to open a step before they could see its parameters.' },
-        { p: 'The output was quick and visually coherent, but it missed details that only surfaced in user research: the need to combine step creation with parameter entry, and clear error states for rack and probe configuration. Still, it produced useful starting layouts for early ideation when time is tight.' },
+        { p: "Although I didn't use AI during the actual project, I was curious how well today's AI tools could handle a complex B2B workflow. I used Lovable to generate alternative wireframes for the method-creation interface and compared them with my own designs." },
+        { columns: [
+          [ { img: 'ai-lovable.jpg', cap: 'Lovable interface' } ],
+          [
+            { sub: 'Prompts I used in Lovable, to recreate my workflow:' },
+            { list: [
+              "Generate wireframes for a laboratory method-creation workflow where users select presets ('favorites'), add steps, and configure racks, probes, and well plates. Reduce repetitive setup and allow method editing.",
+              'Create a web app flow for lab technicians to build and edit multi-step sample prep methods. Include: step list, parameter form, reusable templates, and clear error states.',
+              'Suggest wireframe layouts using a design system: buttons, dropdowns, tabs, and form fields. Optimize for speed and clarity for technical users.',
+            ] },
+          ],
+        ] },
+        { p: 'The output was quick and visually coherent, but it missed critical details that only came from user research:' },
+        { list: [
+          'The need to combine step creation and parameter entry.',
+          'The importance of clear error states for rack and probe configuration.',
+        ] },
+        { p: 'Still, it produced useful starting layouts that could inspire early ideation when time is tight.' },
+        { video: 'ai-lovable-demo.mp4', cap: 'The Lovable prototype lacked rack and probe configuration, and forced technicians to open a method step before they could see its parameters.' },
         { callout: { label: 'Takeaway', text: 'Comparing my hand-designed wireframes with the AI-generated ones confirmed it: AI can accelerate layout exploration, but it still lacks the context and nuance you only get from user interviews.' } },
       ],
     },
@@ -91,13 +107,21 @@ const revvity = {
     {
       id: 'test',
       label: '06 · Testing',
-      heading: 'Usability testing showed simpler flows, but exposed one confusion: technicians were unsure they could edit a method after tapping its card.',
+      heading: 'Usability testing showed the flows were much simpler, but exposed one confusion: technicians were unsure they could edit a method after tapping its card.',
       blocks: [
         { p: "They didn't realize that tapping the method-steps panel opened a details page where editing was possible, which could add operation time. To fix it, I added an expanded parameters section with clear Edit and Delete buttons right on the panel." },
-        { img: 'test-before.jpg', cap: 'Before: technicians could only tap the panel to view parameters on a separate page. Testing showed this was not intuitive.' },
-        { video: 'test-before-demo.mp4', cap: 'Before: parameter details lived on a separate page.' },
-        { img: 'test-after.jpg', cap: 'After: parameters are visible inline, with Edit and Delete available right on the panel.' },
-        { video: 'test-after-demo.mp4', cap: 'After: technicians edit or delete a method directly from the panel.' },
+        { columns: [
+          [
+            { sub: 'Before Usability Tests' },
+            { img: 'test-before.jpg' },
+            { video: 'test-before-demo.mp4', cap: 'Before: parameter details lived on a separate page.' },
+          ],
+          [
+            { sub: 'After Usability Tests (Extended section + Edit and Delete buttons)' },
+            { img: 'test-after.jpg' },
+            { video: 'test-after-demo.mp4', cap: 'After: technicians edit or delete a method directly from the panel.' },
+          ],
+        ] },
       ],
     },
     {

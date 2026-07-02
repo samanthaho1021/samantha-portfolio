@@ -97,9 +97,9 @@ function Metrics({ items }) {
 
 // A framed image or looping video. No fixed aspect ratio, so wide diagrams and
 // tall panels both display in full.
-function Figure({ src, video, caption, max = '760px' }) {
+function Figure({ src, video, caption, max = '760px', tight = false }) {
   return (
-    <figure style={{ margin: '32px auto', maxWidth: max }}>
+    <figure style={{ margin: tight ? '0 0 12px' : '32px auto', maxWidth: tight ? '100%' : max }}>
       <div style={{ border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 40px rgba(62,42,31,0.10)', background: 'var(--white)' }}>
         {video ? (
           <video src={video} autoPlay loop muted playsInline preload="metadata" style={{ display: 'block', width: '100%' }} />
@@ -112,15 +112,22 @@ function Figure({ src, video, caption, max = '760px' }) {
   );
 }
 
-function Block({ block, IMG }) {
+function Block({ block, IMG, tight }) {
   if (block.p) return <Body>{block.p}</Body>;
   if (block.sub) return <SubHead>{block.sub}</SubHead>;
   if (block.quote) return <Quote label={block.quote.label}>{block.quote.text}</Quote>;
   if (block.callout) return <Callout label={block.callout.label}>{block.callout.text}</Callout>;
   if (block.list) return <List items={block.list} />;
   if (block.metrics) return <Metrics items={block.metrics} />;
-  if (block.img) return <Figure src={`${IMG}/${block.img}`} caption={block.cap} max={block.max} />;
-  if (block.video) return <Figure video={`${IMG}/${block.video}`} caption={block.cap} max={block.max} />;
+  if (block.columns) return (
+    <div className="cs-2col">
+      {block.columns.map((col, ci) => (
+        <div key={ci}>{col.map((b, bi) => <Block key={bi} block={b} IMG={IMG} tight />)}</div>
+      ))}
+    </div>
+  );
+  if (block.img) return <Figure src={`${IMG}/${block.img}`} caption={block.cap} max={block.max} tight={tight} />;
+  if (block.video) return <Figure video={`${IMG}/${block.video}`} caption={block.cap} max={block.max} tight={tight} />;
   return null;
 }
 
@@ -172,12 +179,39 @@ export default function NarrativeCaseStudy({ data }) {
         <div className="cs-layout">
           <CaseStudyNav sections={data.sections} />
           <div className="cs-content">
-            {data.beats.map(beat => (
-              <Section key={beat.id} id={beat.id} label={beat.label}>
-                {beat.heading && <H2>{beat.heading}</H2>}
-                {beat.blocks.map((block, i) => <Block key={i} block={block} IMG={IMG} />)}
-              </Section>
-            ))}
+            {data.beats.map(beat => {
+              const inner = (
+                <>
+                  {beat.heading && <H2>{beat.heading}</H2>}
+                  {beat.blocks.map((block, i) => <Block key={i} block={block} IMG={IMG} />)}
+                </>
+              );
+              if (beat.dark) {
+                return (
+                  <Section key={beat.id} id={beat.id}>
+                    <div style={{
+                      background: '#290137', borderRadius: '16px', padding: '40px 40px 44px',
+                      '--ink': '#ffffff', '--ink-soft': 'rgba(255,255,255,0.80)', '--ink-muted': 'rgba(255,255,255,0.62)',
+                      '--white': 'rgba(255,255,255,0.06)', '--border': 'rgba(255,255,255,0.18)',
+                      '--accent': '#C4B5FD', '--accent-light': 'rgba(196,181,253,0.16)',
+                    }}>
+                      {beat.label && (
+                        <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <span style={{ width: '24px', height: '1px', background: 'var(--accent)', display: 'inline-block' }} />
+                          {beat.label}
+                        </div>
+                      )}
+                      {inner}
+                    </div>
+                  </Section>
+                );
+              }
+              return (
+                <Section key={beat.id} id={beat.id} label={beat.label}>
+                  {inner}
+                </Section>
+              );
+            })}
 
             {/* Next project nav */}
             <div style={{ borderTop: '1px solid var(--border)', paddingTop: '48px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
