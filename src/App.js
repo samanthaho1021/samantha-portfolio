@@ -76,13 +76,15 @@ const globalStyles = `
   .stagger-5 { animation-delay: 0.5s; opacity: 0; }
 
   /* Case study: two-column body (sticky section nav + content) */
-  .cs-layout { display: flex; gap: 48px; align-items: flex-start; max-width: 1240px; margin: 0 auto; }
-  .cs-content { flex: 1; min-width: 0; max-width: 970px; }
-  .cs-nav { position: sticky; top: 96px; width: 190px; flex-shrink: 0; align-self: flex-start; }
+  .cs-layout { display: flex; gap: 48px; align-items: flex-start; justify-content: center; max-width: 1280px; margin: 0 auto; }
+  .cs-content { flex: 0 1 800px; min-width: 0; }
+  .cs-nav { position: sticky; top: 96px; width: 190px; flex: 0 0 190px; align-self: flex-start; }
+  .cs-layout::after { content: ''; flex: 0 0 190px; }
   @media (max-width: 1100px) {
     .cs-nav { display: none; }
     .cs-layout { display: block; }
-    .cs-content { max-width: 970px; margin: 0 auto; }
+    .cs-content { max-width: 800px; margin: 0 auto; }
+    .cs-layout::after { display: none; }
   }
 
   /* Home page: work cards grid */
