@@ -82,6 +82,12 @@ const globalStyles = `
     .cs-layout { display: block; }
     .cs-content { max-width: 970px; margin: 0 auto; }
   }
+
+  /* Home page: work cards grid */
+  .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  @media (max-width: 720px) {
+    .work-grid { grid-template-columns: 1fr; }
+  }
 `;
 
 // ── NAV ────────────────────────────────────────────────────
@@ -162,10 +168,11 @@ const projects = [
     number: '01',
     company: 'Suger · AI Product Designer · 2025–2026',
     title: 'Suger Partner Intelligence System',
-    subtitle: 'Designing Contact List + PRM — from "who do I call?" to a full partner relationship layer for cloud marketplace sellers.',
+    subtitle: 'Designing Contact List + PRM, from "who do I call?" to a full partner relationship layer for cloud marketplace sellers.',
     tags: ['B2B SaaS', 'AI Features', 'Systems Design', 'PRM'],
     color: '#1A4D2E',
     bgColor: '#E4EDE5',
+    image: '/thumbs/suger-prm.jpg',
     link: '/case-study/suger-prm',
     live: true,
   },
@@ -173,11 +180,12 @@ const projects = [
     id: 'tax-management',
     number: '02',
     company: 'Suger · AI Product Designer · 2026',
-    title: 'Tax Management — Revenue-to-Tax Reconciliation',
-    subtitle: 'A 0→1 feature that audits whether every dollar of marketplace revenue is represented in the tax books — then explains the gaps and fixes the missing records with one click.',
+    title: 'Tax Management: Revenue-to-Tax Reconciliation',
+    subtitle: 'A 0→1 feature that audits whether every dollar of marketplace revenue is represented in the tax books, then explains the gaps and fixes the missing records with one click.',
     tags: ['B2B SaaS', 'AI Features', 'Fintech / Tax', '0→1'],
     color: '#1F4E46',
     bgColor: '#E1EDE9',
+    image: '/thumbs/tax-management.jpg',
     link: '/case-study/tax-management',
     live: true,
   },
@@ -190,6 +198,7 @@ const projects = [
     tags: ['B2B SaaS', 'Biotech', 'Workflow Design'],
     color: '#1A4D2E',
     bgColor: '#E8F5EC',
+    image: '/thumbs/revvity.jpg',
     link: 'https://samanthaho-productdesigner.framer.website/revvity',
     live: false,
   },
@@ -202,6 +211,7 @@ const projects = [
     tags: ['Dashboard', 'Data Viz', 'B2B SaaS'],
     color: '#7C2D12',
     bgColor: '#FEF3EC',
+    image: '/thumbs/crypto.jpg',
     link: 'https://samanthaho-productdesigner.framer.website/crypto-arsenal',
     live: false,
   },
@@ -214,32 +224,27 @@ const projects = [
     tags: ['Service Design', 'NGO', 'Research'],
     color: '#064E3B',
     bgColor: '#ECFDF5',
+    image: '/thumbs/greenpeace.jpg',
     link: 'https://samanthaho-productdesigner.framer.website/greenpeace',
+    live: false,
+  },
+  {
+    id: 'a-chance-in-life',
+    number: '06',
+    company: 'A Chance in Life · UX Researcher & Designer · 2024',
+    title: 'Run to Donate: A Fitness Challenge App',
+    subtitle: 'A run-to-donate concept for A Chance in Life, turning everyday walks and runs into donations, backed by user research and a full app flow.',
+    tags: ['Mobile App', 'UX Research', 'NGO'],
+    color: '#1D4ED8',
+    bgColor: '#E8F0FE',
+    image: '/thumbs/a-chance-in-life.jpg',
+    link: 'https://samanthaho-productdesigner.framer.website/a-chance-in-life',
     live: false,
   },
 ];
 
-function ProjectCard({ project, index }) {
+function ProjectCard({ project }) {
   const [hovered, setHovered] = useState(false);
-
-  const cardStyle = {
-    display: 'grid',
-    gridTemplateColumns: '80px 1fr auto',
-    gap: '0 32px',
-    padding: '36px 0',
-    borderTop: '1px solid var(--border)',
-    cursor: 'pointer',
-    transition: 'all 0.3s ease',
-    textDecoration: 'none',
-    color: 'inherit',
-  };
-
-  const numStyle = {
-    fontFamily: 'var(--serif)',
-    fontSize: '13px',
-    color: 'var(--ink-muted)',
-    paddingTop: '4px',
-  };
 
   const tagStyle = (color, bg) => ({
     display: 'inline-flex',
@@ -253,29 +258,54 @@ function ProjectCard({ project, index }) {
     letterSpacing: '0.02em',
   });
 
-  const arrowStyle = {
-    fontSize: '20px',
-    color: 'var(--ink-muted)',
-    transform: hovered ? 'translate(4px, -4px)' : 'translate(0,0)',
-    transition: 'transform 0.3s ease',
-    alignSelf: 'flex-start',
-    paddingTop: '4px',
-  };
-
   const content = (
     <div
-      style={cardStyle}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        background: 'var(--white)',
+        border: '1px solid var(--border)',
+        borderRadius: '16px',
+        overflow: 'hidden',
+        boxShadow: hovered ? '0 18px 40px rgba(62,42,31,0.14)' : '0 2px 12px rgba(62,42,31,0.05)',
+        transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
+        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+      }}
     >
-      <div style={numStyle}>{project.number}</div>
-      <div>
+      {/* Thumbnail */}
+      <div style={{ position: 'relative', background: project.bgColor, aspectRatio: '16 / 10', overflow: 'hidden' }}>
+        <img
+          src={project.image}
+          alt={project.title}
+          loading="lazy"
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            display: 'block',
+            transform: hovered ? 'scale(1.03)' : 'scale(1)',
+            transition: 'transform 0.4s ease',
+          }}
+        />
+        <span style={{
+          position: 'absolute', top: '14px', left: '14px',
+          fontFamily: 'var(--serif)', fontSize: '13px', fontWeight: '600',
+          color: 'var(--ink)', background: 'rgba(255,255,255,0.88)',
+          padding: '3px 10px', borderRadius: '100px',
+        }}>{project.number}</span>
+      </div>
+
+      {/* Body */}
+      <div style={{ padding: '22px 24px 24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={{ fontSize: '12px', color: 'var(--ink-muted)', marginBottom: '8px', fontWeight: '400', letterSpacing: '0.02em' }}>
           {project.company}
         </div>
         <div style={{
           fontFamily: 'var(--serif)',
-          fontSize: '26px',
+          fontSize: '22px',
           lineHeight: '1.25',
           marginBottom: '10px',
           color: hovered ? project.color : 'var(--ink)',
@@ -283,10 +313,10 @@ function ProjectCard({ project, index }) {
         }}>
           {project.title}
         </div>
-        <div style={{ fontSize: '14px', color: 'var(--ink-soft)', lineHeight: '1.6', maxWidth: '600px', marginBottom: '16px' }}>
+        <div style={{ fontSize: '14px', color: 'var(--ink-soft)', lineHeight: '1.6', marginBottom: '16px' }}>
           {project.subtitle}
         </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: 'auto' }}>
           {project.tags.map(tag => (
             <span key={tag} style={tagStyle(project.color, project.bgColor)}>{tag}</span>
           ))}
@@ -295,19 +325,19 @@ function ProjectCard({ project, index }) {
           )}
         </div>
       </div>
-      <div style={arrowStyle}>↗</div>
     </div>
   );
 
+  const linkStyle = { textDecoration: 'none', color: 'inherit', display: 'block', height: '100%' };
   if (project.live) {
-    return <Link to={project.link} style={{ textDecoration: 'none', color: 'inherit' }}>{content}</Link>;
+    return <Link to={project.link} style={linkStyle}>{content}</Link>;
   }
-  return <a href={project.link} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', color: 'inherit' }}>{content}</a>;
+  return <a href={project.link} target="_blank" rel="noreferrer" style={linkStyle}>{content}</a>;
 }
 
 function HomePage() {
   return (
-    <div style={{ paddingTop: '140px', maxWidth: '900px', margin: '0 auto', padding: '140px 40px 80px' }}>
+    <div style={{ paddingTop: '140px', maxWidth: '1040px', margin: '0 auto', padding: '140px 40px 80px' }}>
       {/* Hero */}
       <div style={{ marginBottom: '80px' }}>
         <div className="fade-up stagger-1" style={{
@@ -367,13 +397,14 @@ function HomePage() {
 
       {/* Projects */}
       <div className="fade-up stagger-5">
-        <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'var(--ink-muted)', textTransform: 'uppercase', marginBottom: '0' }}>
+        <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'var(--ink-muted)', textTransform: 'uppercase', marginBottom: '24px' }}>
           Selected Work
         </div>
-        {projects.map((project, i) => (
-          <ProjectCard key={project.id} project={project} index={i} />
-        ))}
-        <div style={{ borderTop: '1px solid var(--border)' }} />
+        <div className="work-grid">
+          {projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
       </div>
 
       {/* Footer */}
