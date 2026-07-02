@@ -547,75 +547,52 @@ function ExplorationTable({ rows }) {
   );
 }
 
-const PRM_VID = '/case-studies/prm/video';
-// Autoplaying product-demo video in a browser-chrome frame (fixed 16:10 screen).
-function PrmVideo({ src, url = 'console.suger.io/partners', radius = '12px' }) {
+const PRM_ASSET = '/case-studies/prm/product';
+// Real Suger PRM product demo (video or image) in a browser-chrome frame.
+// Tall content scrolls inside the frame so nothing is cropped.
+function ProductFrame({ src, url = 'app.suger.io', label = 'Live product' }) {
+  const isImg = /\.(png|jpe?g|gif)$/i.test(src);
   return (
-    <div style={{ border: '1px solid var(--border)', borderRadius: radius, overflow: 'hidden', boxShadow: '0 12px 40px rgba(62,42,31,0.10)' }}>
+    <div style={{ border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 40px rgba(62,42,31,0.10)' }}>
       <div style={{ background: '#1a1a2e', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
         <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
         <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
         <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#22c55e' }} />
         <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '4px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginLeft: '4px' }}>{url}</div>
-        <span style={{ background: '#F97316', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '100px' }}>PrimeOne DS</span>
+        <span style={{ background: '#16A34A', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '100px' }}>{label}</span>
       </div>
-      <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', background: '#f8fafc' }}>
-        <video src={src} autoPlay loop muted playsInline preload="metadata" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} />
+      <div style={{ maxHeight: '540px', overflow: 'auto', background: '#f8fafc' }}>
+        {isImg
+          ? <img src={src} alt="" loading="lazy" style={{ display: 'block', width: '100%' }} />
+          : <video src={src} autoPlay loop muted playsInline preload="metadata" style={{ display: 'block', width: '100%' }} />}
       </div>
     </div>
   );
 }
 
 function PartnerDiscoverySection() {
-  const [activeTab, setActiveTab] = useState('discovery');
-  const frameContent = (
-    <PrmVideo
-      radius="0"
-      url={`console.suger.io/partners${activeTab === 'invite' ? '/invite' : activeTab === 'collab' ? '/collaborations' : '/discovery'}`}
-      src={`${PRM_VID}/${activeTab === 'invite' ? 'invite' : activeTab === 'collab' ? 'collab' : 'discovery'}.mp4`}
-    />
-  );
-
-  const tabs = [
-    { id: 'discovery', label: '🔍 Partner Discovery' },
-    { id: 'invite', label: '✦ Invite Wizard' },
-    { id: 'collab', label: '🤝 Collaborations' },
+  const FEATURES = [
+    { title: 'Marketplace-native co-sell', desc: 'Outbound partner deal registration straight from the CRM, with unified revenue attribution across hyperscalers and channel partners.', src: `${PRM_ASSET}/deal-registration.mp4`, url: 'Salesforce · Suger co-sell' },
+    { title: 'Commissions & payouts', desc: 'Commission-plan templates with overrides and SPIFF / SPF programs, applied automatically on co-sells.', src: `${PRM_ASSET}/commission-plans.mp4`, url: 'app.suger.io/partners · commissions' },
+    { title: 'White-label partner portal', desc: 'A partner-facing portal that runs under the customer’s own domain and brand.', src: `${PRM_ASSET}/white-label-portal.mp4`, url: 'partners.yourbrand.com' },
+    { title: 'Partner LMS & enablement', desc: 'Courses and certification tracking to onboard and enable partners at scale.', src: `${PRM_ASSET}/partner-lms.mp4`, url: 'app.suger.io/partners · training' },
+    { title: 'Partner management & analytics', desc: 'A partner-management workspace with program analytics and revenue attribution.', src: `${PRM_ASSET}/partner-revenue.png`, url: 'app.suger.io/partners · analytics' },
   ];
 
   return (
-    <Section id="prototype" label="06 · Prototype — Partner Discovery & Collaborations">
-      <H2>Designing for partner discovery and AI-assisted outreach</H2>
+    <Section id="prototype" label="06 · The shipped product">
+      <H2>What shipped — the live PRM product</H2>
       <Body>
-        Two prototypes ship alongside the core PRM: a Partner Discovery surface that ranks candidate partners by account overlap and channel fit, and an AI-drafted outreach flow that turns "I should reach out" into a one-click invite. The Collaborations tab reflects the state after partners accept — shared accounts auto-map and activity flows into the main dashboard.
+        The structure I designed shipped as Suger’s PRM product, built on the PrimeOne design system. These are the live features running in production — co-sell, commissions, the white-label portal, partner enablement, and analytics.
       </Body>
 
-      <div style={{ display: 'flex', gap: '8px', margin: '24px 0 16px', flexWrap: 'wrap' }}>
-        {tabs.map(tab => {
-          const active = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                padding: '9px 16px',
-                borderRadius: '100px',
-                fontSize: '13px',
-                fontWeight: '500',
-                cursor: 'pointer',
-                border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
-                background: active ? 'var(--accent)' : 'var(--white)',
-                color: active ? 'white' : 'var(--ink)',
-                transition: 'all 0.2s',
-                fontFamily: 'var(--sans)',
-              }}
-            >
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {frameContent}
+      {FEATURES.map(f => (
+        <div key={f.title} style={{ margin: '32px 0' }}>
+          <h3 style={{ fontFamily: 'var(--serif)', fontSize: '22px', marginBottom: '8px', color: 'var(--ink)' }}>{f.title}</h3>
+          <Body style={{ marginBottom: '16px' }}>{f.desc}</Body>
+          <ProductFrame src={f.src} url={f.url} />
+        </div>
+      ))}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '32px' }}>
         <Callout label="AI Design Decision">
@@ -707,7 +684,7 @@ const PRM_SECTIONS = [
   { id: 'discovery', label: 'Discovery' },
   { id: 'contact-list', label: 'Contact List' },
   { id: 'prm', label: 'PRM' },
-  { id: 'prototype', label: 'Prototype' },
+  { id: 'prototype', label: 'Product' },
   { id: 'system', label: 'System' },
   { id: 'impact', label: 'Impact' },
   { id: 'ai-tools', label: 'AI Tools' },
@@ -728,8 +705,8 @@ function SugerCaseStudy() {
               <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '4px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginLeft: '4px' }}>console.suger.io/partners</div>
               <span style={{ background: '#F97316', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '100px' }}>PrimeOne DS</span>
             </div>
-            <div style={{ aspectRatio: '16 / 10', overflow: 'hidden', background: '#f8fafc' }}>
-              <video src={`${PRM_VID}/dashboard.mp4`} autoPlay loop muted playsInline preload="metadata" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} />
+            <div style={{ maxHeight: '520px', overflow: 'auto', background: '#f8fafc' }}>
+              <img src={`${PRM_ASSET}/partner-analytics.png`} alt="Suger PRM partner management dashboard" style={{ display: 'block', width: '100%' }} />
             </div>
             <a href="https://suger-prm.lovable.app" target="_blank" rel="noreferrer" style={{ background: '#F97316', padding: '10px 16px', textAlign: 'center', fontSize: '11px', fontWeight: '600', color: 'white', display: 'block', textDecoration: 'none', width: '100%' }}>↗ View the early Lovable prototype</a>
           </div>
