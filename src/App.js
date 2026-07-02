@@ -881,7 +881,7 @@ function PartnerDiscoverySection() {
     <Section id="prototype" label="06 · Prototype, Partner Discovery & Collaborations">
       <H2>Two prototypes push the model further: one helps sellers find partners worth pursuing, the other turns "I should reach out" into a one-click, AI-drafted invite.</H2>
       <Body>
-        Two prototypes ship alongside the core PRM: a Partner Discovery surface that ranks candidate partners by account overlap and channel fit, and an AI-drafted outreach flow that turns "I should reach out" into a one-click invite. The Collaborations tab reflects the state after partners accept, shared accounts auto-map and activity flows into the main dashboard.
+        Finding a partner worth pursuing was its own problem; sellers were relying on gut and hallway conversations. Partner Discovery ranks candidate partners by account overlap and channel fit, so the shortlist is data-backed instead of remembered. The Invite Wizard then drafts the outreach from those same signals, and the Collaborations tab picks up once a partner accepts: shared accounts auto-map and activity starts flowing into the main dashboard. Try the three tabs below to walk each flow.
       </Body>
 
       <div style={{ display: 'flex', gap: '8px', margin: '24px 0 16px', flexWrap: 'wrap' }}>
@@ -1301,17 +1301,18 @@ function SugerCaseStudy() {
         {/* Problem */}
         <Section id="problem" label="02 · The Problem">
           <H2>The deeper I looked, the clearer it got: the real problem wasn't one deal at a time. It was that no one could see a partner relationship whole.</H2>
+          <Body>The problem lived at two levels, and they turned out to be the same one. Before a deal, sellers couldn't find the right contact. After a deal, they couldn't see the relationship that contact belonged to. Both traced back to a single root cause: the data existed in Suger, but it was organized for the system, not for the seller.</Body>
 
           <div style={{ marginBottom: '32px' }}>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '22px', marginBottom: '12px', color: 'var(--ink)' }}>Phase 1: Who do I call?</h3>
-            <Body>The co-sell flow asks sellers to submit an opportunity with a cloud contact. But contact selection was essentially manual, sellers had to know the right AWS PSM or GCP rep for their region, industry, and deal size from memory. Most didn't. They'd pick the wrong person, get ignored, or loop in their CSM just to find a name.</Body>
-            <Quote cite="Account Executive, discovery interview">Honestly? I'd just message my CSM and ask who owns the account at AWS. Half the time the name they gave me had already switched teams.</Quote>
-            <Callout label="Insight">The data to solve this already existed in our system, historical co-sell outcomes, account coverage mappings, domain associations. We just weren't surfacing it.</Callout>
+            <Body>The co-sell flow asks sellers to submit an opportunity with a cloud contact. But contact selection was essentially manual. Sellers had to know the right AWS PSM or GCP rep for their region, industry, and deal size from memory. Most didn't. They'd pick the wrong person, get ignored, or loop in their CSM just to find a name.</Body>
+            <Callout label="Insight">The data to solve this already existed in our system: historical co-sell outcomes, account coverage mappings, domain associations. We just weren't surfacing it.</Callout>
           </div>
 
           <div>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '22px', marginBottom: '12px', color: 'var(--ink)' }}>Phase 2: What happens after the call?</h3>
             <Body>Sellers who worked with resellers and channel partners had no unified view of those relationships. CPPOs were in the Offers tab. Co-sells were in the Co-Sell tab. Shared accounts were buried in Account Mapping. Revenue attributed to a partner required manual cross-referencing across four different pages.</Body>
+            <Quote cite="Channel Manager, discovery interview">By the time I've pulled up Offers, Co-Sell, and Account Mapping to piece one partner together, I've lost the thread on what I was even trying to decide.</Quote>
             <Callout label="The connection">I didn't design Contact List and PRM as two separate projects. Contact List revealed the problem that PRM solved. The same data gap, contacts scattered, relationships untracked, revenue unattributed, existed at both the individual and company level. Solving one without the other would have left sellers with half the picture.</Callout>
           </div>
 
@@ -1346,7 +1347,7 @@ function SugerCaseStudy() {
         {/* Discovery */}
         <Section id="discovery" label="03 · Discovery">
           <H2>Before opening Figma, we studied how every existing PRM tool solved this, and found the gap they all left open.</H2>
-          <Body>Before touching Figma, Gabriel (PM) and I researched how existing PRM tools approached these problems, and where they failed. We looked closely at Euler, Impartner, and Crossbeam/PartnerTap.</Body>
+          <Body>Before touching Figma, Gabriel (PM) and I researched how existing PRM tools approached these problems, and more usefully, where they broke down. We looked closely at Euler, Impartner, and Crossbeam/PartnerTap, mapping each against one question: how fast does a seller actually get value, and what has to happen before they do? I owned the design and information-architecture decisions; Gabriel and I set the Phase 1 scope together. The pattern that emerged from that comparison shaped our entire strategy.</Body>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', margin: '32px 0' }}>
             {[
@@ -1386,13 +1387,14 @@ function SugerCaseStudy() {
             ))}
           </div>
 
-          <ProductMedia src="/case-studies/prm/product/deal-registration.mp4" caption="Deal registration, one of the partner surfaces I co-designed with Gabriel (PM)" />
+          <ProductMedia src="/case-studies/prm/product/deal-registration.mp4" caption="Deal registration with no partner login, the principle in the shipped product. Co-designed with Gabriel (PM)." />
         </Section>
 
         {/* Contact List */}
         <Section id="contact-list" label="04 · Design, Contact List">
           <H2>On paper, the assignment was simple: give sellers a filterable list of cloud contacts so they'd stop guessing at names.</H2>
-          <Body>Contact List was a new product surface I designed from scratch, a structured, filterable view of cloud contacts enriched with AI-predicted signals to help sellers identify the right person to engage for a specific deal.</Body>
+          <Body>So I designed Contact List from scratch: a structured, filterable view of cloud reps, buyers, and partners. But the moment I looked at the data behind it, the real design problem surfaced. Our backend could already predict who to call. The question was no longer whether we could build a list; it was how much of that intelligence to put in front of a seller without eroding their trust in it.</Body>
+          <Quote cite="Account Executive, discovery interview">Half the time I'm picking an AWS rep off a hunch. If they go quiet, I've lost a week, and I still don't know if I asked the right person.</Quote>
           <Body>The core table handled three user types (cloud reps, buyers, and partners) with 14 columns: Name, Source, Role, Cloud Partner, Managed Domains, Industries, Owners, Region, Coverage Location, # of Accounts, Open Pipeline, Closed Won, Success Rate, and Last Updated.</Body>
 
           <div style={{ margin: '40px 0' }}>
@@ -1404,8 +1406,7 @@ function SugerCaseStudy() {
               { option: 'Option C: No AI signals', rationale: 'Clean list with no provenance indicators. Simpler UI but sellers lose trust, they can\'t tell which contacts are reliable vs. guessed.', decision: 'Rejected, breaks trust in the data.', verdict: 'rejected' },
             ]} />
             <Body>The confidence score lived in the backend and informed ranking. But we deliberately didn't expose the number in the UI. The 'Predicted' badge (yellow) and 'Referral' badge (green) gave sellers enough signal to calibrate trust without adding a number they'd have to interpret.</Body>
-            <Quote cite="Channel Manager, discovery interview">I don't want a match percentage. I want to know if this is the person who actually closed deals that look like mine.</Quote>
-            <Callout label="Stakeholder tension">The hardest disagreement wasn't about layout. Sellers wanted the list clean and act-on-able, so we hid the score. Cloud reps, who saw the same accounts surfaced to them, wanted to know why an account was flagged before they'd trust it. One audience's clarity was the other's missing context. Phase 1 optimized for the seller, and that trade is one I call out again in the reflection.</Callout>
+            <Callout label="The tradeoff I own">Sellers wanted the fastest path to a name; cloud reps, further down the funnel, wanted to know why an account surfaced. I optimized the shipped view for sellers and kept the confidence signal in the backend. That was the right call for launch, and it is also the tradeoff I would revisit first (see Reflection).</Callout>
           </div>
 
           <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '32px', margin: '32px 0' }}>
@@ -1476,7 +1477,7 @@ function SugerCaseStudy() {
         {/* PRM */}
         <Section id="prm" label="05 · Design, PRM">
           <H2>The core decision wasn't visual. It was whether to keep organizing partner data by transaction type, the way the product already did, or rebuild it around the partner.</H2>
-          <Body>PRM Phase 1 was the bigger design challenge, not because individual components were complex, but because the architectural decision about how to organize partner data would shape every surface downstream.</Body>
+          <Body>PRM Phase 1 was the bigger design challenge, not because individual components were complex, but because one architectural decision would shape every surface downstream. The product already stored partner data by transaction type: CPPOs in one place, co-sells in another, shared accounts in a third. Reorganizing it around the partner meant rethinking the data model, not just the layout. Every screen that followed depended on getting this one call right.</Body>
 
           <ExplorationTable rows={[
             { option: 'Organized by type (current)', rationale: 'Offers tab shows all CPPOs. Co-Sell tab shows all referrals. Sellers must mentally join these to understand one partner relationship.', decision: 'Current state, too much cognitive load across four pages.', verdict: 'rejected' },
@@ -1570,12 +1571,7 @@ function SugerCaseStudy() {
             <div style={{ fontSize: '12px', color: 'var(--ink-muted)', textAlign: 'center', marginTop: '8px' }}>Partner Profile, Revenue metrics, AI overview, and basic information panel</div>
           </div>
 
-          <div style={{ margin: '40px 0' }}>
-            <h3 style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '12px', color: 'var(--ink)' }}>Designing for an offshore build</h3>
-            <Body>The engineering team building PRM sat in China, several time zones from the US design team, so I couldn't lean on hallway conversations to fill gaps in a spec. I designed every surface to stand on its own: explicit empty, loading, and error states, exact column and sort behavior, and redline-level spacing, so a screen could be built correctly without a synchronous back and forth. Co-designing the data surfaces with Gabriel (PM) up front meant the handoff carried the reasoning behind each decision, not just the pixels.</Body>
-          </div>
-
-          <ProductMedia src="/case-studies/prm/product/partner-revenue.png" caption="Partner revenue view, co-designed with Gabriel (PM)" />
+          <ProductMedia src="/case-studies/prm/product/partner-revenue.png" caption="Unified partner revenue and attribution across hyperscalers and channel partners, in the shipped product. Co-designed with Gabriel (PM)." />
 
           {/* Prototype → Production transition */}
           <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--ink)', marginBottom: '16px' }}>From early prototype to production</div>
@@ -1593,6 +1589,11 @@ function SugerCaseStudy() {
               <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.85)', lineHeight: '1.6' }}>The design then moved out of Lovable and into the Suger app itself, implemented on the <strong>PrimeOne design system</strong>. The screens throughout this case study reflect that production build.</div>
             </div>
           </div>
+
+          <div style={{ margin: '48px 0 0' }}>
+            <h3 style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '12px', color: 'var(--ink)' }}>Designing for an offshore build</h3>
+            <Body>Because engineering was in a timezone twelve hours away, ambiguity was expensive: a spec that read fine in California could cost a full sprint if it was misread overnight. So I over-specified the hard parts, annotated the shadow-partner edge cases and degraded states directly on the flows, and used the Lovable prototype as a clickable source of truth the team could walk through instead of interpreting static frames. Shipping on the PrimeOne design system did the rest, fewer round-trips on visual details meant the conversation stayed on behavior.</Body>
+          </div>
         </Section>
 
         {/* Prototype, Partner Discovery & Collaborations */}
@@ -1601,7 +1602,7 @@ function SugerCaseStudy() {
         {/* The System */}
         <Section id="system" label="07 · The System">
           <H2>Contact List and PRM were never two projects. They're the same problem at different altitudes, running on one shared data layer.</H2>
-          <Body>These weren't two separate projects. They're the same problem at different levels of abstraction.</Body>
+          <Body>Contact List works at the level of a single person; PRM works at the level of the partner company that person belongs to. But both answer the same question: who should I engage, and what's our history with them? And both read from the same account-mapping backend. Designing them together meant a contact tagged in one surface enriches the partner record in the other, with no duplicate data entry. That shared layer is what makes the two feel like one product instead of two tools bolted together.</Body>
 
           <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--ink)', marginBottom: '20px', marginTop: '24px' }}>How data flows between Contact List and PRM</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', alignItems: 'center', justifyContent: 'center', margin: '24px 0' }}>
@@ -1669,9 +1670,9 @@ function SugerCaseStudy() {
         {/* Impact */}
         <Section id="impact" label="08 · Impact">
           <H2>Phase 1 is still shipping, so rather than project metrics I can't yet defend, I'm showing the design decisions themselves, and the outcome each one is built to move.</H2>
-          <Body>PRM Phase 1 is in active development. Rather than projecting metrics, here are the concrete, defensible impacts of the design decisions themselves.</Body>
+          <Body>PRM Phase 1 is still in active development, so I won't pretend to have adoption numbers yet. What I can point to are the design decisions themselves. Each one made a specific, measurable bet about how sellers would work. Below are four that changed what a seller can actually do, and underneath each, the outcome it was built to move. The honest version of impact is naming those bets clearly, not inventing results.</Body>
 
-          <ProductMedia src="/case-studies/prm/product/partner-analytics.png" caption="Partner analytics view, co-designed with Gabriel (PM)" />
+          <ProductMedia src="/case-studies/prm/product/partner-analytics.png" caption="The partner management workspace in the shipped product. Co-designed with Gabriel (PM)." />
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', margin: '32px 0' }}>
             {[
@@ -1705,13 +1706,13 @@ function SugerCaseStudy() {
 
           <div style={{ margin: '40px 0 0' }}>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '6px', color: 'var(--ink)' }}>How we'll measure Phase 1</h3>
-            <div style={{ fontSize: '13px', color: 'var(--ink-muted)', marginBottom: '20px' }}>These are the targets Phase 1 is designed to move, not results. The feature is still shipping.</div>
+            <div style={{ fontSize: '13px', color: 'var(--ink-muted)', marginBottom: '20px' }}>These are targets we're instrumenting, not results. Phase 1 is still shipping.</div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
               {[
-                { metric: 'Contact accuracy', target: 'At least 80% of predicted contacts confirmed as the right person to engage' },
-                { metric: 'Time-to-contact', target: 'Cut the time from opportunity to first partner touch by half' },
-                { metric: 'Partner-view adoption', target: '60% of active co-sell sellers open a Partner Profile each month' },
-                { metric: 'Attribution coverage', target: '90% of partner-sourced revenue auto-attributed, with no manual cross-referencing' },
+                { metric: 'Contact accuracy', target: 'Share of co-sells submitted to a Predicted or Referral contact versus a manual guess.' },
+                { metric: 'Time-to-contact', target: 'Minutes from opening a co-sell to selecting a cloud rep.' },
+                { metric: 'Partner-view adoption', target: 'Share of channel-active sellers using the Partner Profile weekly.' },
+                { metric: 'Attribution coverage', target: 'Percent of partner revenue auto-attributed without manual cross-referencing.' },
               ].map(({ metric, target }) => (
                 <div key={metric} style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
@@ -1727,30 +1728,30 @@ function SugerCaseStudy() {
 
         {/* What's Next */}
         <Section id="next" label="09 · What's Next">
-          <H2>Phase 1 earns the right to build the rest: the surfaces that turn a seller-only view into a two-sided partner platform.</H2>
-          <Body>Everything in Phase 1 runs on data Suger already has, with no partner login required. That was the constraint that made it shippable, and it's also the launch pad. Once sellers trust the partner view, the roadmap opens up the surfaces that need partners in the loop, and the ones that turn tracking into action.</Body>
+          <H2>The features I cut from Phase 1 weren't dropped. They were sequenced, and now they're the roadmap.</H2>
+          <Body>Phase 1 deliberately shipped only what worked from existing marketplace data with zero partner adoption required. The features that needed partner buy-in or new infrastructure were pushed to later phases, and that sequencing is now playing out in the product. Every later phase leans on the partner-centric data model Phase 1 established, which is what lets them ship without a rebuild.</Body>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', margin: '32px 0 0' }}>
             {[
-              { tag: 'Next', title: 'Commission plans', body: 'Model and track partner commissions against real marketplace transactions, so revenue share stops living in spreadsheets and reconciles against the same data the Partner Profile already shows.', src: '/case-studies/prm/product/commission-plans.mp4' },
-              { tag: 'Later', title: 'White-label partner portal', body: 'The two-sided step: give partners their own branded login to see shared pipeline and co-sell status. This is the moment PRM stops being seller-only, so the Phase 1 shadow-partner model was designed to graduate into real partner accounts without a rebuild.', src: '/case-studies/prm/product/white-label-portal.mp4' },
-              { tag: 'Later', title: 'Partner LMS', body: 'Enablement and certification tracking inside the portal, so partner readiness becomes a signal sellers can act on alongside revenue and account overlap.', src: '/case-studies/prm/product/partner-lms.mp4' },
-            ].map(({ tag, title, body, src }) => (
+              { title: 'Commissions and payouts', body: 'Set a commission plan once; payouts calculate automatically on deal close, with SPIFFs and overrides. This depends on partner-level revenue attribution, the exact data model Phase 1 established.', src: '/case-studies/prm/product/commission-plans.mp4' },
+              { title: 'White-label partner portal', body: 'The whole program under the customer\'s own domain and brand; partners never see Suger. It extends the seller-facing surfaces outward to partners themselves.', src: '/case-studies/prm/product/white-label-portal.mp4' },
+              { title: 'Partner LMS and enablement', body: 'Courses, quizzes, and certifications inside the portal, so partners are trained and certified to sell.', src: '/case-studies/prm/product/partner-lms.mp4' },
+            ].map(({ title, body, src }) => (
               <div key={title}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--accent)', background: 'var(--accent-light)', padding: '2px 8px', borderRadius: '100px' }}>{tag}</span>
-                  <h3 style={{ fontFamily: 'var(--serif)', fontSize: '22px', color: 'var(--ink)', margin: 0 }}>{title}</h3>
-                </div>
+                <h3 style={{ fontFamily: 'var(--serif)', fontSize: '22px', color: 'var(--ink)', margin: '0 0 8px' }}>{title}</h3>
                 <Body>{body}</Body>
                 <ProductMedia src={src} caption={title} />
               </div>
             ))}
           </div>
+
+          <Callout label="Why the order held up">Each later phase leans on the partner-centric data model from Phase 1. Reorganizing data by partner first is what makes commissions, attribution, and portal views possible without a rebuild.</Callout>
         </Section>
 
         {/* AI Tools */}
         <Section id="ai-tools" label="10 · AI in My Workflow">
           <H2>I leaned on AI tools deliberately throughout, to move faster on exploration without handing over the design decisions.</H2>
+          <Body>AI didn't replace any part of my process. It compressed the slow parts. I used it to stand up structural prototypes, generate layout variations to react against, and even build the AI-powered features I was designing, while keeping every actual design decision my own. The rule I held to: AI drafts, I decide. Here's where each tool earned its place.</Body>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', margin: '24px 0' }}>
             {[
               { tool: 'Claude Code', use: 'Rapid prototyping and portfolio rebuild. Used to generate and iterate on front-end components without blocking on dev cycles.' },
@@ -1771,6 +1772,7 @@ function SugerCaseStudy() {
         {/* Reflection */}
         <Section id="reflection" label="11 · Reflection">
           <H2>Looking back, three things I'd do differently, most of them about messiness I underestimated going in.</H2>
+          <Body>Shipping Phase 1 taught me as much about what I'd missed as what I got right. Most of my regrets trace back to the same theme: I designed confidently from the seller's point of view, and underestimated the messiness underneath. The other users I wasn't designing for, the edge cases, and how dirty real partner data would be. None were fatal, but each cost iteration cycles I could have saved.</Body>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', margin: '24px 0' }}>
             {[
               { title: 'Involve cloud reps earlier', body: 'We designed primarily from the seller\'s perspective. Post-launch, cloud reps wanted more context about why accounts were highlighted, a confidence signal we removed from the seller-facing view.' },
