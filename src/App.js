@@ -547,62 +547,391 @@ function ExplorationTable({ rows }) {
   );
 }
 
-const PRM_ASSET = '/case-studies/prm/product';
-// Real Suger PRM product demo (video or image) in a browser-chrome frame.
-// Tall content scrolls inside the frame so nothing is cropped.
-function ProductFrame({ src, url = 'app.suger.io', label = 'Live product' }) {
-  const isImg = /\.(png|jpe?g|gif)$/i.test(src);
+function ProductMedia({ src, caption }) {
+  const isVideo = src.endsWith('.mp4');
+  const frame = {
+    maxWidth: '100%', width: '100%', display: 'block',
+    borderRadius: '10px', border: '1px solid var(--border)',
+    boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+  };
   return (
-    <div style={{ border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 40px rgba(62,42,31,0.10)' }}>
-      <div style={{ background: '#1a1a2e', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#ef4444' }} />
-        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#f59e0b' }} />
-        <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: '#22c55e' }} />
-        <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '4px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginLeft: '4px' }}>{url}</div>
-        <span style={{ background: '#16A34A', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '100px' }}>{label}</span>
-      </div>
-      <div style={{ maxHeight: '540px', overflow: 'auto', background: '#f8fafc' }}>
-        {isImg
-          ? <img src={src} alt="" loading="lazy" style={{ display: 'block', width: '100%' }} />
-          : <video src={src} autoPlay loop muted playsInline preload="metadata" style={{ display: 'block', width: '100%' }} />}
-      </div>
+    <div style={{ margin: '32px auto', textAlign: 'center' }}>
+      {isVideo ? (
+        <video src={src} style={frame} autoPlay loop muted playsInline preload="metadata" />
+      ) : (
+        <img src={src} style={frame} loading="lazy" alt={caption} />
+      )}
+      {caption && <div style={{ fontSize: '12px', color: 'var(--ink-muted)', marginTop: '8px' }}>{caption}</div>}
     </div>
   );
 }
 
+function Quote({ children, cite }) {
+  return (
+    <blockquote style={{ margin: '28px 0', paddingLeft: '22px', borderLeft: '3px solid var(--accent)' }}>
+      <p style={{ fontFamily: 'var(--serif)', fontSize: '19px', color: 'var(--ink)', lineHeight: '1.6', margin: 0 }}>&ldquo;{children}&rdquo;</p>
+      <footer style={{ fontSize: '12px', color: 'var(--ink-muted)', marginTop: '10px' }}>{cite}</footer>
+    </blockquote>
+  );
+}
+
 function PartnerDiscoverySection() {
-  const FEATURES = [
-    { title: 'Marketplace-native co-sell', desc: 'Outbound partner deal registration straight from the CRM, with unified revenue attribution across hyperscalers and channel partners.', src: `${PRM_ASSET}/deal-registration.mp4`, url: 'Salesforce · Suger co-sell' },
-    { title: 'Commissions & payouts', desc: 'Commission-plan templates with overrides and SPIFF / SPF programs, applied automatically on co-sells.', src: `${PRM_ASSET}/commission-plans.mp4`, url: 'app.suger.io/partners · commissions' },
-    { title: 'White-label partner portal', desc: 'A partner-facing portal that runs under the customer’s own domain and brand.', src: `${PRM_ASSET}/white-label-portal.mp4`, url: 'partners.yourbrand.com' },
-    { title: 'Partner LMS & enablement', desc: 'Courses and certification tracking to onboard and enable partners at scale.', src: `${PRM_ASSET}/partner-lms.mp4`, url: 'app.suger.io/partners · training' },
-    { title: 'Partner management & analytics', desc: 'A partner-management workspace with program analytics and revenue attribution.', src: `${PRM_ASSET}/partner-revenue.png`, url: 'app.suger.io/partners · analytics' },
+  const [activeTab, setActiveTab] = useState('discovery');
+  const [discoveryStep, setDiscoveryStep] = useState('list');
+  const [inviteStep, setInviteStep] = useState(1);
+
+  const tabs = [
+    { id: 'discovery', label: '🔍 Partner Discovery' },
+    { id: 'invite', label: '✦ Invite Wizard' },
+    { id: 'collab', label: '🤝 Collaborations' },
   ];
 
+  const channelColors = {
+    AWS: { color: '#FF9900', bg: '#FFF3E0' },
+    Azure: { color: '#0078D4', bg: '#E3F2FF' },
+    GCP: { color: '#4285F4', bg: '#E8F0FE' },
+  };
+  const typeColors = { Reseller: '#A855F7', SI: '#10B981', ISV: '#F59E0B' };
+  const scoreColor = (s) => (s >= 90 ? '#10B981' : s >= 75 ? '#F59E0B' : '#EF4444');
+  const scoreBg = (s) => (s >= 90 ? '#DCFCE7' : s >= 75 ? '#FEF3C7' : '#FEE2E2');
+
+  const NavBar = () => (
+    <div style={{ background: '#1a1a2e', padding: '12px 24px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+        <div style={{ fontFamily: 'var(--serif)', color: 'white', fontSize: '18px', fontWeight: '500' }}>suger</div>
+        <div style={{ display: 'flex', gap: '20px', fontSize: '13px' }}>
+          {['Dashboard', 'Partners', 'Deals', 'Accounts', 'Reports'].map(l => (
+            <span key={l} style={{ color: l === 'Partners' ? 'white' : 'rgba(255,255,255,0.55)', fontWeight: l === 'Partners' ? '600' : '400' }}>{l}</span>
+          ))}
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <span style={{ fontSize: '14px', color: 'rgba(255,255,255,0.7)' }}>🔔</span>
+        <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: '#F97316', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '11px', fontWeight: '600' }}>SH</div>
+      </div>
+    </div>
+  );
+
+  const SubTabs = ({ active }) => {
+    const items = [
+      { id: 'all', label: 'All Partners' },
+      { id: 'discovery', label: 'Partner Discovery' },
+      { id: 'collab', label: 'Collaborations', badge: '6' },
+      { id: 'cosell', label: 'Partner Co-Sells' },
+    ];
+    return (
+      <div style={{ display: 'flex', gap: '0', borderBottom: '1px solid #e2e8f0', padding: '0 24px', background: 'white' }}>
+        {items.map(item => {
+          const on = item.id === active;
+          return (
+            <div key={item.id} style={{ padding: '14px 0', marginRight: '24px', fontSize: '14px', color: on ? '#1e293b' : '#64748b', fontWeight: on ? '600' : '400', borderBottom: on ? '2px solid #F97316' : '2px solid transparent', display: 'flex', gap: '6px', alignItems: 'center', cursor: 'pointer' }}>
+              {item.label}
+              {item.badge && <span style={{ fontSize: '10px', background: '#e2e8f0', color: '#64748b', padding: '1px 6px', borderRadius: '100px', fontWeight: '600' }}>{item.badge}</span>}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const scoreLabel = (s) => (s >= 90 ? 'High' : s >= 75 ? 'Medium' : 'Low');
+  const partners = [
+    { name: 'Stratosphere IT', type: 'Reseller', channels: ['AWS', 'Azure', 'GCP'], targets: 'Acme Corp, Northwind, +12', rev: '$4.2M', score: 94 },
+    { name: 'NexGen Consulting', type: 'SI', channels: ['Azure', 'GCP'], targets: 'Globex, Initech, +7', rev: '$3.1M', score: 87 },
+    { name: 'CloudSync Solutions', type: 'Reseller', channels: ['AWS', 'Azure'], targets: 'Umbrella Data, Hooli, +10', rev: '$2.5M', score: 91 },
+    { name: 'DataBridge Partners', type: 'SI', channels: ['AWS'], targets: 'Stark Systems, +6', rev: '$1.9M', score: 78 },
+    { name: 'Meridian Software', type: 'ISV', channels: ['Azure'], targets: 'Wayne Retail, +4', rev: '$1.6M', score: 72 },
+    { name: 'PeakCloud Tech', type: 'ISV', channels: ['AWS'], targets: 'Soylent, +3', rev: '$890K', score: 68 },
+  ];
+
+  const renderDiscoveryList = () => (
+    <div style={{ background: '#f8fafc' }}>
+      <NavBar />
+      <SubTabs active="discovery" />
+      <div style={{ padding: '24px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px', gap: '16px' }}>
+          <div>
+            <h3 style={{ fontSize: '20px', color: '#1e293b', fontWeight: '600', marginBottom: '4px' }}>✦ Suggested Partners <span style={{ color: '#94a3b8', fontWeight: '500' }}>(6)</span></h3>
+            <div style={{ fontSize: '13px', color: '#64748b' }}>Marketplace partners with potential deals matching your CRM accounts.</div>
+          </div>
+          <button onClick={() => setDiscoveryStep('invite')} style={{ background: '#F97316', color: 'white', fontSize: '13px', fontWeight: '600', padding: '10px 16px', borderRadius: '6px', border: 'none', cursor: 'pointer', flexShrink: 0 }}>+ Invite Partner</button>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+          {partners.map(p => (
+            <div key={p.name} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px', gap: '8px' }}>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#1e293b' }}>{p.name}</div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', fontSize: '11px', fontWeight: '600', color: scoreColor(p.score) }}>
+                  <span style={{ width: '7px', height: '7px', borderRadius: '50%', background: scoreColor(p.score) }} />{scoreLabel(p.score)}
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginBottom: '12px' }}>
+                <span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '100px', background: `${typeColors[p.type]}1a`, color: typeColors[p.type] }}>{p.type}</span>
+                {p.channels.map(c => (
+                  <span key={c} style={{ fontSize: '10px', fontWeight: '600', padding: '2px 6px', borderRadius: '4px', background: channelColors[c].bg, color: channelColors[c].color }}>{c}</span>
+                ))}
+              </div>
+              <div style={{ fontSize: '10px', fontWeight: '700', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '3px' }}>Recommended Targets</div>
+              <div style={{ fontSize: '12px', color: '#475569', marginBottom: '12px' }}>{p.targets}</div>
+              <div style={{ borderTop: '1px solid #e2e8f0', paddingTop: '10px', display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontSize: '10px', color: '#64748b' }}>Potential Revenue</div>
+                  <div style={{ fontSize: '16px', fontWeight: '700', color: '#1e293b' }}>{p.rev}</div>
+                </div>
+                <button onClick={() => setDiscoveryStep('invite')} style={{ background: 'white', color: '#334155', fontSize: '12px', fontWeight: '600', padding: '7px 16px', borderRadius: '6px', border: '1px solid #cbd5e1', cursor: 'pointer' }}>Invite</button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const wizardSteps = ['Purpose', 'Context', 'Tone', 'Email', 'Review'];
+  const radio = (on) => ({ width: '15px', height: '15px', borderRadius: '50%', border: on ? '5px solid #F97316' : '2px solid #cbd5e1', flexShrink: 0 });
+  const fieldLabel = { fontSize: '11px', fontWeight: '600', color: '#475569', marginBottom: '4px', display: 'block' };
+  const fieldBox = { border: '1px solid #e2e8f0', borderRadius: '6px', padding: '8px 10px', fontSize: '13px', color: '#1e293b', background: 'white' };
+
+  const renderInviteFlow = () => (
+    <div style={{ background: '#f8fafc' }}>
+      <div style={{ background: '#1a1a2e', padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <span onClick={() => { setInviteStep(1); setDiscoveryStep('list'); if (activeTab === 'invite') setActiveTab('discovery'); }} style={{ color: 'rgba(255,255,255,0.7)', fontSize: '14px', cursor: 'pointer' }}>← Back</span>
+        <div style={{ color: 'white', fontSize: '14px', fontWeight: '500' }}>Partner Engagement</div>
+      </div>
+      <div style={{ padding: '24px' }}>
+        {/* 5-step stepper */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '22px', flexWrap: 'wrap' }}>
+          {wizardSteps.map((label, i) => {
+            const n = i + 1; const active = inviteStep === n; const done = inviteStep > n;
+            return (
+              <React.Fragment key={label}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '7px' }}>
+                  <div style={{ width: '24px', height: '24px', borderRadius: '50%', background: done ? '#10B981' : active ? '#F97316' : '#e2e8f0', color: (done || active) ? 'white' : '#64748b', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: '600' }}>{done ? '✓' : n}</div>
+                  <span style={{ fontSize: '12px', color: active ? '#1e293b' : '#64748b', fontWeight: active ? '600' : '400' }}>{label}</span>
+                </div>
+                {i < wizardSteps.length - 1 && <div style={{ width: '22px', height: '1px', background: '#e2e8f0' }} />}
+              </React.Fragment>
+            );
+          })}
+        </div>
+
+        {/* STEP 1, Purpose + mode + domain classification */}
+        {inviteStep === 1 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px 14px', background: 'white' }}>
+                <span style={radio(false)} /><span style={{ fontSize: '13px', color: '#475569' }}>Select recommended partner</span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', border: '2px solid #F97316', borderRadius: '8px', padding: '12px 14px', background: '#fff7ed' }}>
+                <span style={radio(true)} /><span style={{ fontSize: '13px', color: '#1e293b', fontWeight: '600' }}>Invite a new partner</span>
+              </div>
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div><label style={fieldLabel}>Partner Company Name</label><div style={fieldBox}>Stratosphere IT</div></div>
+              <div><label style={fieldLabel}>Contact Email Address</label><div style={fieldBox}>mike@stratosphere-it.example</div></div>
+            </div>
+            {/* Domain-classification preview (live = Case C) */}
+            <div style={{ border: '1px solid #e9d5ff', background: 'linear-gradient(135deg,#faf5ff,#f3e8ff)', borderRadius: '8px', padding: '14px 16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span style={{ fontSize: '15px' }}>✦</span>
+                <span style={{ fontSize: '13px', fontWeight: '700', color: '#7C3AED' }}>Stratosphere IT</span>
+                {['AWS', 'Azure'].map(c => <span key={c} style={{ fontSize: '10px', fontWeight: '600', padding: '2px 6px', borderRadius: '4px', background: channelColors[c].bg, color: channelColors[c].color }}>{c}</span>)}
+              </div>
+              <div style={{ fontSize: '12px', color: '#6b21a8' }}>We recognise this partner as a marketplace reseller on the channels above.</div>
+            </div>
+            <div style={{ fontSize: '11px', color: '#94a3b8' }}>Detected from the email domain: <strong>A</strong> existing Suger customer · <strong>B</strong> new (direct) · <strong style={{ color: '#7C3AED' }}>C known reseller ✓</strong></div>
+          </div>
+        )}
+
+        {/* STEP 2, Context */}
+        {inviteStep === 2 && (
+          <div>
+            <label style={fieldLabel}>Context about your collaboration goals (optional)</label>
+            <div style={{ ...fieldBox, minHeight: '96px', color: '#475569', lineHeight: '1.6' }}>We share 14 accounts in financial services and see strong co-sell potential on AWS. Would love to align on joint pipeline for FY26.</div>
+          </div>
+        )}
+
+        {/* STEP 3, Tone */}
+        {inviteStep === 3 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {[['Professional', true], ['Casual', false], ['Custom', false]].map(([t, on]) => (
+              <div key={t} style={{ display: 'flex', alignItems: 'center', gap: '10px', border: on ? '2px solid #F97316' : '1px solid #e2e8f0', background: on ? '#fff7ed' : 'white', borderRadius: '8px', padding: '12px 14px' }}>
+                <span style={radio(on)} /><span style={{ fontSize: '13px', color: on ? '#1e293b' : '#475569', fontWeight: on ? '600' : '400' }}>{t}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* STEP 4, AI-drafted email */}
+        {inviteStep === 4 && (
+          <div style={{ background: 'linear-gradient(135deg, #faf5ff, #f3e8ff)', border: '1px solid #e9d5ff', borderRadius: '8px', padding: '16px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <span style={{ fontSize: '16px' }}>✦</span>
+              <span style={{ fontSize: '13px', fontWeight: '600', color: '#7C3AED' }}>AI-drafted email</span>
+              <span style={{ display: 'inline-flex', gap: '3px' }}>
+                {[0, 1, 2].map(i => <span key={i} style={{ width: '5px', height: '5px', borderRadius: '50%', background: '#A855F7', opacity: 0.5 + (i * 0.15), animation: `fadeIn 1.4s ease-in-out ${i * 0.2}s infinite alternate` }} />)}
+              </span>
+            </div>
+            <div style={{ fontSize: '11px', color: '#6b21a8', marginBottom: '8px' }}>Subject: Partnering on shared AWS accounts</div>
+            <div style={{ background: 'white', border: '1px solid #e9d5ff', borderRadius: '6px', padding: '16px', fontSize: '13px', color: '#1e293b', lineHeight: '1.7' }}>
+              <div style={{ marginBottom: '10px' }}>Hi Mike,</div>
+              <div style={{ marginBottom: '10px' }}>I noticed we share <strong>14 accounts</strong>, particularly in financial services, which aligns closely with your team's expertise.</div>
+              <div style={{ marginBottom: '10px' }}>With your <strong>AWS Advanced Tier</strong> status, there's a real opportunity to collaborate on co-sell motions around these shared customers.</div>
+              <div>Looking forward to hearing from you,<br />Samantha</div>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 5, Review */}
+        {inviteStep === 5 && (
+          <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '18px' }}>
+            <div style={{ fontSize: '11px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: '12px' }}>Review &amp; send</div>
+            {[['Partner', 'Stratosphere IT (new · reseller)'], ['Purpose', 'Account Overlap'], ['Recipient', 'mike@stratosphere-it.example'], ['Tone', 'Professional']].map(([k, v]) => (
+              <div key={k} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid #f1f5f9', fontSize: '13px' }}>
+                <span style={{ color: '#64748b' }}>{k}</span><span style={{ color: '#1e293b', fontWeight: '500' }}>{v}</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* SENT confirmation */}
+        {inviteStep === 6 && (
+          <div>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '20px' }}>
+              <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#DCFCE7', color: '#10B981', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '26px', marginBottom: '12px' }}>✓</div>
+              <div style={{ fontSize: '18px', fontWeight: '600', color: '#1e293b', marginBottom: '4px' }}>Invitation sent to Stratosphere IT</div>
+              <div style={{ fontSize: '13px', color: '#64748b' }}>It'll appear under Collaborations → Threads as an outbound invite.</div>
+            </div>
+            <button onClick={() => { setInviteStep(1); setDiscoveryStep('list'); setActiveTab('discovery'); }} style={{ background: 'white', color: '#1e293b', fontSize: '13px', fontWeight: '500', padding: '10px 18px', borderRadius: '6px', border: '1px solid #e2e8f0', cursor: 'pointer' }}>← Back to Discovery</button>
+          </div>
+        )}
+
+        {/* Wizard footer nav */}
+        {inviteStep <= 5 && (
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '20px' }}>
+            <button onClick={() => setInviteStep(Math.max(1, inviteStep - 1))} disabled={inviteStep === 1}
+              style={{ background: 'white', color: inviteStep === 1 ? '#cbd5e1' : '#1e293b', fontSize: '13px', fontWeight: '500', padding: '9px 18px', borderRadius: '6px', border: '1px solid #e2e8f0', cursor: inviteStep === 1 ? 'default' : 'pointer' }}>Back</button>
+            <button onClick={() => setInviteStep(inviteStep + 1)}
+              style={{ background: '#F97316', color: 'white', fontSize: '13px', fontWeight: '600', padding: '9px 20px', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>{inviteStep === 5 ? 'Send ↗' : 'Next'}</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  const threads = [
+    { partner: 'CloudSync Solutions', type: 'Account Overlap', subject: 'Partnering on shared AWS accounts', accounts: 'Acme Corp +3', state: 'Accepted', dir: 'Outbound', recipient: 'dana@cloudsync.example', created: 'Jun 2' },
+    { partner: 'Stratosphere IT', type: 'Account Overlap', subject: 'Co-sell on financial services book', accounts: 'Northwind +13', state: 'Sent', dir: 'Outbound', recipient: 'mike@stratosphere-it.example', created: 'Just now' },
+    { partner: 'NexGen Consulting', type: 'Deal Collaboration', subject: 'Joint pursuit, Globex migration', accounts: 'Globex', state: 'Accepted', dir: 'Inbound', recipient: 'you@yourco.example', created: 'May 28' },
+    { partner: 'DataBridge Partners', type: 'Network Invitation', subject: 'Intro, partner network', accounts: 'Stark Systems', state: 'Declined', dir: 'Outbound', recipient: 'ops@databridge.example', created: 'May 20' },
+    { partner: 'Meridian Software', type: 'Account Overlap', subject: 'Overlap on Wayne Retail', accounts: 'Wayne Retail', state: 'Accepted', dir: 'Inbound', recipient: 'you@yourco.example', created: 'May 15' },
+  ];
+
+  const stateStyle = (s) => (
+    s === 'Accepted' ? { color: '#166534', bg: '#DCFCE7' } :
+    s === 'Sent' ? { color: '#92400E', bg: '#FEF3C7' } :
+    { color: '#991B1B', bg: '#FEE2E2' }
+  );
+  const dirStyle = (d) => (d === 'Inbound' ? { color: '#0369A1', bg: '#E0F2FE' } : { color: '#475569', bg: '#F1F5F9' });
+
+  const renderCollab = () => (
+    <div style={{ background: '#f8fafc' }}>
+      <NavBar />
+      <SubTabs active="collab" />
+      <div style={{ padding: '24px' }}>
+        {/* Threads / Pending Invitations sub-tabs */}
+        <div style={{ display: 'flex', gap: '20px', borderBottom: '1px solid #e2e8f0', marginBottom: '16px' }}>
+          <div style={{ padding: '8px 0', fontSize: '13px', fontWeight: '600', color: '#1e293b', borderBottom: '2px solid #F97316', display: 'flex', gap: '6px', alignItems: 'center' }}>Threads <span style={{ fontSize: '10px', background: '#e2e8f0', color: '#64748b', padding: '1px 6px', borderRadius: '100px' }}>5</span></div>
+          <div style={{ padding: '8px 0', fontSize: '13px', color: '#64748b', display: 'flex', gap: '6px', alignItems: 'center' }}>Pending Invitations <span style={{ fontSize: '10px', background: '#e2e8f0', color: '#64748b', padding: '1px 6px', borderRadius: '100px' }}>1</span></div>
+        </div>
+        {/* Threads table */}
+        <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '8px', overflow: 'hidden' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1.6fr 0.8fr 0.9fr 1.3fr 0.7fr 32px', gap: '8px', padding: '10px 14px', background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+            {['Partner', 'Type', 'Subject', 'State', 'Direction', 'Recipient', 'Created', ''].map(h => (
+              <div key={h} style={{ fontSize: '9px', fontWeight: '700', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{h}</div>
+            ))}
+          </div>
+          {threads.map((t, i) => {
+            const st = stateStyle(t.state); const dr = dirStyle(t.dir);
+            return (
+              <div key={i} style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr 1.6fr 0.8fr 0.9fr 1.3fr 0.7fr 32px', gap: '8px', padding: '11px 14px', borderBottom: i < threads.length - 1 ? '1px solid #f1f5f9' : 'none', alignItems: 'center' }}>
+                <div style={{ fontSize: '12px', fontWeight: '600', color: '#1e293b' }}>{t.partner}</div>
+                <div style={{ fontSize: '11px', color: '#64748b' }}>{t.type}</div>
+                <div style={{ fontSize: '11px', color: '#475569', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.subject}</div>
+                <div><span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '100px', background: st.bg, color: st.color }}>{t.state}</span></div>
+                <div><span style={{ fontSize: '10px', fontWeight: '600', padding: '2px 8px', borderRadius: '100px', background: dr.bg, color: dr.color }}>{t.dir}</span></div>
+                <div style={{ fontSize: '11px', color: '#64748b', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{t.recipient}</div>
+                <div style={{ fontSize: '11px', color: '#64748b' }}>{t.created}</div>
+                <div style={{ fontSize: '13px', color: '#94a3b8', textAlign: 'center' }}>👁</div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
+  const frameContent =
+    activeTab === 'discovery' && discoveryStep === 'list' ? renderDiscoveryList() :
+    activeTab === 'discovery' && discoveryStep === 'invite' ? renderInviteFlow() :
+    activeTab === 'invite' ? renderInviteFlow() :
+    renderCollab();
+
   return (
-    <Section id="prototype" label="06 · The shipped product">
-      <H2>What shipped — the live PRM product</H2>
+    <Section id="prototype" label="06 · Prototype, Partner Discovery & Collaborations">
+      <H2>Two prototypes push the model further: one helps sellers find partners worth pursuing, the other turns "I should reach out" into a one-click, AI-drafted invite.</H2>
       <Body>
-        The structure I designed shipped as Suger’s PRM product, built on the PrimeOne design system. These are the live features running in production — co-sell, commissions, the white-label portal, partner enablement, and analytics.
+        Two prototypes ship alongside the core PRM: a Partner Discovery surface that ranks candidate partners by account overlap and channel fit, and an AI-drafted outreach flow that turns "I should reach out" into a one-click invite. The Collaborations tab reflects the state after partners accept, shared accounts auto-map and activity flows into the main dashboard.
       </Body>
 
-      {FEATURES.map(f => (
-        <div key={f.title} style={{ margin: '32px 0' }}>
-          <h3 style={{ fontFamily: 'var(--serif)', fontSize: '22px', marginBottom: '8px', color: 'var(--ink)' }}>{f.title}</h3>
-          <Body style={{ marginBottom: '16px' }}>{f.desc}</Body>
-          <ProductFrame src={f.src} url={f.url} />
-        </div>
-      ))}
+      <div style={{ display: 'flex', gap: '8px', margin: '24px 0 16px', flexWrap: 'wrap' }}>
+        {tabs.map(tab => {
+          const active = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                if (tab.id !== 'invite') setInviteStep(1);
+                if (tab.id === 'discovery') setDiscoveryStep('list');
+              }}
+              style={{
+                padding: '9px 16px',
+                borderRadius: '100px',
+                fontSize: '13px',
+                fontWeight: '500',
+                cursor: 'pointer',
+                border: active ? '1px solid var(--accent)' : '1px solid var(--border)',
+                background: active ? 'var(--accent)' : 'var(--white)',
+                color: active ? 'white' : 'var(--ink)',
+                transition: 'all 0.2s',
+                fontFamily: 'var(--sans)',
+              }}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
+      </div>
+
+      <div style={{
+        border: '1px solid var(--border)',
+        borderRadius: '12px',
+        overflow: 'hidden',
+        boxShadow: '0 12px 40px rgba(62,42,31,0.08)',
+      }}>
+        {frameContent}
+      </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '32px' }}>
         <Callout label="AI Design Decision">
-          The invite message is generated from the same signals that scored the partner — shared accounts, cloud tier, industry fit. Sellers always see the draft before sending and can Regenerate or Edit. Trust comes from making AI's reasoning legible, not from automating the send.
+          The invite message is generated from the same signals that scored the partner, shared accounts, cloud tier, industry fit. Sellers always see the draft before sending and can Regenerate or Edit. Trust comes from making AI's reasoning legible, not from automating the send.
         </Callout>
         <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px' }}>
           <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '12px' }}>Collaborations tab key decisions</div>
           {[
-            'Single row per partner — status, deals, shared accounts, last activity all visible without drilling in',
-            'Distinct CTAs per state: View for Active, muted Pending/Follow up for inactive states — sellers know where to spend energy',
+            'Single row per partner, status, deals, shared accounts, last activity all visible without drilling in',
+            'Distinct CTAs per state: View for Active, muted Pending/Follow up for inactive states, sellers know where to spend energy',
             'Status ordering bubbles Pending Acceptance and Invited to the top so follow-up actions surface first',
           ].map(d => (
             <div key={d} style={{ display: 'flex', gap: '10px', fontSize: '13px', color: 'var(--ink-soft)', lineHeight: '1.55', marginBottom: '8px' }}>
@@ -613,10 +942,10 @@ function PartnerDiscoverySection() {
         </div>
       </div>
 
-      {/* Invite intelligence — domain classification + data-integrity decisions */}
+      {/* Invite intelligence, domain classification + data-integrity decisions */}
       <div style={{ marginTop: '32px' }}>
         <h3 style={{ fontFamily: 'var(--serif)', fontSize: '22px', marginBottom: '12px', color: 'var(--ink)' }}>One invite button, three cases</h3>
-        <Body>An invite isn't just an email — it can link two organizations together. So as the seller types a contact email, the system quietly classifies the domain, and provisions the partnership correctly only once the partner accepts.</Body>
+        <Body>An invite isn't just an email, it can link two organizations together. So as the seller types a contact email, the system quietly classifies the domain, and provisions the partnership correctly only once the partner accepts.</Body>
         <div style={{ margin: '20px 0', borderRadius: '10px', overflow: 'hidden', border: '1px solid var(--border)' }}>
           <div style={{ display: 'grid', gridTemplateColumns: '70px 1fr 1.2fr', background: 'var(--ink)', padding: '10px 14px' }}>
             {['Case', 'The domain is…', 'What happens on acceptance'].map(h => (
@@ -636,13 +965,13 @@ function PartnerDiscoverySection() {
           ))}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginTop: '8px' }}>
-          <Callout label="Product decision">Create nothing until acceptance. Sending only writes an invitation — the partnership is provisioned when the partner accepts, so the partner list never fills with speculative relationships that never happened.</Callout>
+          <Callout label="Product decision">Create nothing until acceptance. Sending only writes an invitation, the partnership is provisioned when the partner accepts, so the partner list never fills with speculative relationships that never happened.</Callout>
           <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px' }}>
             <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '12px' }}>Invisible decisions that protect the data</div>
             {[
-              'Server-side truth over client guesses — the invite is stamped with the server\'s classification and re-checked at accept time',
-              'Idempotent, union-merge sync — a nightly job never clobbers channels a human set; re-running it changes nothing',
-              'Killed status drift — normalized invitation status to one Title-Case vocabulary across the whole stack',
+              'Server-side truth over client guesses, the invite is stamped with the server\'s classification and re-checked at accept time',
+              'Idempotent, union-merge sync, a nightly job never clobbers channels a human set; re-running it changes nothing',
+              'Killed status drift, normalized invitation status to one Title-Case vocabulary across the whole stack',
             ].map(d => (
               <div key={d} style={{ display: 'flex', gap: '10px', fontSize: '13px', color: 'var(--ink-soft)', lineHeight: '1.55', marginBottom: '8px' }}>
                 <span style={{ color: 'var(--accent)', flexShrink: 0 }}>—</span><span>{d}</span>
@@ -684,9 +1013,10 @@ const PRM_SECTIONS = [
   { id: 'discovery', label: 'Discovery' },
   { id: 'contact-list', label: 'Contact List' },
   { id: 'prm', label: 'PRM' },
-  { id: 'prototype', label: 'Product' },
+  { id: 'prototype', label: 'Prototype' },
   { id: 'system', label: 'System' },
   { id: 'impact', label: 'Impact' },
+  { id: 'next', label: "What's Next" },
   { id: 'ai-tools', label: 'AI Tools' },
   { id: 'reflection', label: 'Reflection' },
 ];
@@ -705,8 +1035,156 @@ function SugerCaseStudy() {
               <div style={{ flex: 1, background: 'rgba(255,255,255,0.1)', borderRadius: '4px', padding: '4px 12px', fontSize: '11px', color: 'rgba(255,255,255,0.6)', marginLeft: '4px' }}>console.suger.io/partners</div>
               <span style={{ background: '#F97316', color: 'white', fontSize: '10px', fontWeight: '700', padding: '2px 8px', borderRadius: '100px' }}>PrimeOne DS</span>
             </div>
-            <div style={{ maxHeight: '520px', overflow: 'auto', background: '#f8fafc' }}>
-              <img src={`${PRM_ASSET}/partner-analytics.png`} alt="Suger PRM partner management dashboard" style={{ display: 'block', width: '100%' }} />
+            <div style={{ background: '#f8fafc', padding: 0, width: '100%' }}>
+              {/* Top nav */}
+              <div style={{ background: '#1a1a2e', padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+                  <div style={{ fontSize: '12px', fontWeight: '700', color: 'white' }}>suger</div>
+                  <div style={{ display: 'flex', gap: '12px' }}>
+                    {['Home', 'Marketplace', 'Co-Sell', 'Offers', 'Partners', 'Contacts'].map(l => (
+                      <span key={l} style={{ fontSize: '10px', color: l === 'Partners' ? 'white' : '#94a3b8', fontWeight: l === 'Partners' ? '600' : '400' }}>{l}</span>
+                    ))}
+                  </div>
+                </div>
+                <div style={{ width: '22px', height: '22px', borderRadius: '50%', background: '#F97316', fontSize: '9px', color: 'white', fontWeight: '700', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>JD</div>
+              </div>
+
+              {/* Alert banner */}
+              <div style={{ background: '#fffbeb', borderBottom: '1px solid #fde68a', padding: '6px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <span style={{ fontSize: '11px', color: '#d97706', marginRight: '6px' }}>⚠</span>
+                  <span style={{ fontSize: '10px', color: '#92400e' }}>6 items need attention: 4 co-sell invites, 2 deal registrations</span>
+                </div>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  {['View Invites', 'View Registrations'].map(b => (
+                    <button key={b} style={{ fontSize: '9px', border: '1px solid #d97706', color: '#d97706', background: 'transparent', padding: '2px 8px', borderRadius: '4px', cursor: 'pointer' }}>{b}</button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Page header */}
+              <div style={{ padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <div style={{ fontSize: '14px', fontWeight: '700', color: '#1e293b' }}>Partners</div>
+                  <div style={{ fontSize: '9px', color: '#64748b' }}>Manage your partner ecosystem and track performance</div>
+                </div>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  {['Tasks', 'Partner Files', 'Training'].map(b => (
+                    <button key={b} style={{ border: '1px solid #e2e8f0', fontSize: '9px', color: '#64748b', padding: '4px 10px', borderRadius: '4px', background: 'white', cursor: 'pointer' }}>{b}</button>
+                  ))}
+                  <button style={{ background: '#F97316', color: 'white', fontSize: '9px', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', border: 'none', cursor: 'pointer' }}>+ Invite Partner</button>
+                </div>
+              </div>
+
+              {/* KPI cards */}
+              <div style={{ padding: '0 12px 8px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                {[
+                  { label: 'ACTIVE PARTNERS', value: '15', delta: '+3% vs prior period' },
+                  { label: 'PARTNER-INFLUENCED PIPELINE', value: '$1.8M', delta: '+15%' },
+                  { label: 'PARTNER-SOURCED REVENUE', value: '$1.3M', delta: '+8%' },
+                ].map(k => (
+                  <div key={k.label} style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '8px 10px' }}>
+                    <div style={{ fontSize: '8px', color: '#64748b', letterSpacing: '0.05em' }}>{k.label}</div>
+                    <div style={{ fontSize: '18px', fontWeight: '700', color: '#1e293b' }}>{k.value}</div>
+                    <div style={{ fontSize: '9px', color: '#16a34a' }}>{k.delta}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Charts row */}
+              <div style={{ padding: '0 12px 8px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
+                  <div style={{ fontSize: '10px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>Leading Partners by Revenue</div>
+                  {[
+                    { name: 'Stratosphere IT', width: '85%', value: '$4.2M' },
+                    { name: 'CloudSync', width: '70%', value: '$2.5M' },
+                    { name: 'NexGen', width: '65%', value: '$3.1M' },
+                    { name: 'TerraForm', width: '45%', value: '$2.8M' },
+                    { name: 'DataBridge', width: '40%', value: '$1.9M' },
+                  ].map(b => (
+                    <div key={b.name} style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '3px' }}>
+                      <div style={{ fontSize: '9px', color: '#64748b', width: '80px', flexShrink: 0 }}>{b.name}</div>
+                      <div style={{ height: '8px', borderRadius: '4px', background: '#2D1B69', width: b.width }} />
+                      <div style={{ fontSize: '9px', color: '#1e293b' }}>{b.value}</div>
+                    </div>
+                  ))}
+                </div>
+                <div style={{ background: 'white', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '10px' }}>
+                  <div style={{ fontSize: '10px', fontWeight: '600', color: '#1e293b', marginBottom: '8px' }}>Pipeline at Risk</div>
+                  <div style={{ fontSize: '8px', color: '#64748b', marginBottom: '8px' }}>Co-sells with 30+ days of no activity</div>
+                  {[
+                    { deal: 'Acme Migration', partner: 'Stratosphere IT', days: '45 days' },
+                    { deal: 'HealthNet Deal', partner: 'NexGen', days: '38 days' },
+                    { deal: 'Retail AI Project', partner: 'CloudSync', days: '32 days' },
+                  ].map(r => (
+                    <div key={r.deal} style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '4px', padding: '6px 8px', marginBottom: '4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div>
+                        <div style={{ fontSize: '9px', fontWeight: '600', color: '#1e293b' }}>{r.deal}</div>
+                        <div style={{ fontSize: '8px', color: '#64748b' }}>{r.partner}</div>
+                      </div>
+                      <div style={{ fontSize: '9px', fontWeight: '700', color: '#ea580c' }}>{r.days}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Recent activity */}
+              <div style={{ padding: '0 16px 12px' }}>
+                <div style={{ fontSize: '10px', fontWeight: '600', color: '#1e293b', marginBottom: '6px' }}>Recent Activity</div>
+                {[
+                  { dot: '#16a34a', text: 'Co-Sell Won, TechStart SaaS Expansion closed, $95K', meta: 'CloudSync Solutions · Yesterday' },
+                  { dot: '#d97706', text: 'Deal Registered, Bolt Cloud Migration, $175K (Pending)', meta: 'CloudSync · 2 days ago' },
+                  { dot: '#ea580c', text: 'Co-Sell Tagged, Vertex AI Workloads tagged, $340K', meta: 'Stratosphere IT · 2 days ago' },
+                ].map((a, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '4px 0' }}>
+                    <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: a.dot, flexShrink: 0 }} />
+                    <span style={{ fontSize: '9px', color: '#1e293b' }}>{a.text}</span>
+                    <span style={{ fontSize: '8px', color: '#64748b', marginLeft: 'auto' }}>{a.meta}</span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Partners list tabs */}
+              <div style={{ padding: '0 16px 6px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                {[
+                  { label: 'All Partners', active: true },
+                  { label: 'Partner Discovery', active: false },
+                  { label: 'Collaborations 6', active: false },
+                  { label: 'Partner Co-Sells', active: false },
+                ].map(t => (
+                  <span key={t.label} style={{ background: t.active ? '#1e293b' : '#f1f5f9', color: t.active ? 'white' : '#64748b', fontSize: '9px', fontWeight: '600', padding: '4px 10px', borderRadius: '100px' }}>{t.label}</span>
+                ))}
+              </div>
+
+              {/* Partners table */}
+              <div style={{ padding: '0 16px 12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.8fr 0.9fr 0.9fr 1fr 0.8fr 0.8fr 0.7fr', gap: '8px', padding: '6px 0', borderBottom: '1px solid #e2e8f0' }}>
+                  {['Partner Name', 'Connected', 'Partner Types', 'Channels', 'Partner Manager', 'Total Rev', 'Upcoming', 'Last Activity'].map(h => (
+                    <div key={h} style={{ fontSize: '8px', fontWeight: '600', color: '#64748b', textTransform: 'uppercase' }}>{h}</div>
+                  ))}
+                </div>
+                {[
+                  { name: 'CloudSync Solutions', type: 'RESELLER', connected: true, channels: ['AWS', 'Azure'], mgr: 'Jane Doe', total: '$2.5M', up: '$420K', last: 'Jun 17' },
+                  { name: 'DataBridge Partners', type: 'SI', connected: true, channels: ['AWS'], mgr: 'Sam Lee', total: '$1.9M', up: '$180K', last: 'Jun 14' },
+                  { name: 'NexGen Consulting', type: 'SI', connected: false, channels: ['Azure', 'GCP'], mgr: 'Jane Doe', total: '$3.1M', up: '$560K', last: 'Jun 18' },
+                ].map(p => (
+                  <div key={p.name} style={{ display: 'grid', gridTemplateColumns: '1.5fr 0.8fr 0.9fr 0.9fr 1fr 0.8fr 0.8fr 0.7fr', gap: '8px', padding: '8px 0', borderBottom: '1px solid #f1f5f9', alignItems: 'center' }}>
+                    <div style={{ fontSize: '10px', fontWeight: '600', color: '#1e293b' }}>{p.name}</div>
+                    <div style={{ fontSize: '9px', fontWeight: '600', color: p.connected ? '#16a34a' : '#94a3b8' }}>{p.connected ? '✓ Connected' : '—'}</div>
+                    <div><span style={{ fontSize: '8px', fontWeight: '600', background: '#f1f5f9', color: '#64748b', padding: '1px 6px', borderRadius: '100px' }}>{p.type}</span></div>
+                    <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap' }}>
+                      {p.channels.map(c => {
+                        const s = c === 'AWS' ? { bg: '#fff3e0', color: '#FF9900' } : c === 'Azure' ? { bg: '#e3f2ff', color: '#0078D4' } : { bg: '#e8f0fe', color: '#4285F4' };
+                        return <span key={c} style={{ background: s.bg, color: s.color, fontSize: '8px', padding: '1px 5px', borderRadius: '3px' }}>{c}</span>;
+                      })}
+                    </div>
+                    <div style={{ fontSize: '9px', color: '#64748b' }}>{p.mgr}</div>
+                    <div style={{ fontSize: '10px', fontWeight: '600', color: '#1e293b' }}>{p.total}</div>
+                    <div style={{ fontSize: '9px', color: '#64748b' }}>{p.up}</div>
+                    <div style={{ fontSize: '9px', color: '#64748b' }}>{p.last}</div>
+                  </div>
+                ))}
+              </div>
             </div>
             <a href="https://suger-prm.lovable.app" target="_blank" rel="noreferrer" style={{ background: '#F97316', padding: '10px 16px', textAlign: 'center', fontSize: '11px', fontWeight: '600', color: 'white', display: 'block', textDecoration: 'none', width: '100%' }}>↗ View the early Lovable prototype</a>
           </div>
@@ -727,7 +1205,7 @@ function SugerCaseStudy() {
               fontSize: '16px', color: 'var(--ink-soft)', lineHeight: '1.8',
               fontWeight: '300', marginBottom: '24px',
             }}>
-              What started as a contact list became something bigger. Finding the right person to call was only step one — sellers also needed to track the relationship, attribute revenue, and know which partners were worth investing in.
+              What started as a contact list became something bigger. Finding the right person to call was only step one, sellers also needed to track the relationship, attribute revenue, and know which partners were worth investing in.
             </p>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap', justifyContent: 'center' }}>
               <span style={{ fontSize: '12px', fontWeight: '600', padding: '6px 14px', borderRadius: '100px', background: 'var(--accent-light)', color: 'var(--accent)' }}>Contact List</span>
@@ -747,7 +1225,7 @@ function SugerCaseStudy() {
           {[
             { label: 'Company', value: 'Suger.io' },
             { label: 'Role', value: 'Product Designer (Lead)' },
-            { label: 'Timeline', value: '2025 – 2026' },
+            { label: 'Timeline', value: '2025–2026' },
             { label: 'Status', value: 'Shipped · In Progress' },
           ].map(({ label, value }, i) => (
             <div key={label} style={{
@@ -769,11 +1247,12 @@ function SugerCaseStudy() {
 
         {/* Context */}
         <Section id="context" label="01 · Context">
-          <H2>It started with a contact list</H2>
-          <Body>I was brought onto Suger's co-sell console to solve a straightforward problem: sellers couldn't find the right person to contact at AWS, Azure, or GCP. They were guessing at names, submitting referrals to the wrong reps, and losing deals before they started.</Body>
-          <Body>So I designed Contact List — an AI-powered surface that surfaced predicted cloud contacts based on historical co-sell data, account coverage, and domain associations. It shipped. Sellers started using it.</Body>
-          <Body>But as I watched how sellers actually used Contact List, a bigger pattern emerged. Finding the right contact was only the first step. After the call, sellers had no way to track what happened — no unified view of the partner relationship, no way to attribute revenue, no way to know which partners were worth doubling down on. The data existed in Suger. It was just scattered.</Body>
+          <H2>I was brought on to fix a narrow problem: sellers couldn't find the right cloud contact. The way they used what I shipped revealed a much bigger one.</H2>
+          <Body>Suger's co-sell console had a deceptively simple gap: when a seller went to submit a co-sell, they couldn't reliably find the right person to contact at AWS, Azure, or GCP. So they guessed, pulling names from memory, submitting referrals to the wrong reps, or pinging their CSM just to get one. Deals stalled before they ever really started, and no one could say why with any precision.</Body>
+          <Body>So I designed Contact List, an AI-powered surface that surfaced predicted cloud contacts based on historical co-sell data, account coverage, and domain associations. It shipped. Sellers started using it.</Body>
+          <Body>But as I watched how sellers actually used Contact List, a bigger pattern emerged. Finding the right contact was only the first step. After the call, sellers had no way to track what happened. There was no unified view of the partner relationship, no way to attribute revenue, no way to know which partners were worth doubling down on. The data existed in Suger. It was just scattered.</Body>
           <Callout label="The pivot">Contact List was a feature. What sellers actually needed was a partner intelligence system. That realization turned a contact table into the foundation for PRM.</Callout>
+          <Callout label="The real challenge">This was as much an organizational problem as a design one. I was evolving a feature that had already shipped, across a US design team and an engineering team in China, on a phased timeline, co-designing the data surfaces with our PM. The design question was inseparable from the delivery question: what could we ship in one quarter, in what order, without forcing a rebuild later?</Callout>
           <div style={{ fontSize: '14px', color: 'var(--ink-muted)', margin: '16px 0 0' }}>This case study covers both: Contact List (shipped) and PRM Phase 1 (in development).</div>
 
           <div style={{ background: 'var(--bg)', borderRadius: '12px', border: '1px solid var(--border)', padding: '24px', margin: '32px 0' }}>
@@ -821,23 +1300,24 @@ function SugerCaseStudy() {
 
         {/* Problem */}
         <Section id="problem" label="02 · The Problem">
-          <H2>From deal-level to partner-level thinking</H2>
+          <H2>The deeper I looked, the clearer it got: the real problem wasn't one deal at a time. It was that no one could see a partner relationship whole.</H2>
 
           <div style={{ marginBottom: '32px' }}>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '22px', marginBottom: '12px', color: 'var(--ink)' }}>Phase 1: Who do I call?</h3>
-            <Body>The co-sell flow asks sellers to submit an opportunity with a cloud contact. But contact selection was essentially manual — sellers had to know the right AWS PSM or GCP rep for their region, industry, and deal size from memory. Most didn't. They'd pick the wrong person, get ignored, or loop in their CSM just to find a name.</Body>
-            <Callout label="Insight">The data to solve this already existed in our system — historical co-sell outcomes, account coverage mappings, domain associations. We just weren't surfacing it.</Callout>
+            <Body>The co-sell flow asks sellers to submit an opportunity with a cloud contact. But contact selection was essentially manual, sellers had to know the right AWS PSM or GCP rep for their region, industry, and deal size from memory. Most didn't. They'd pick the wrong person, get ignored, or loop in their CSM just to find a name.</Body>
+            <Quote cite="Account Executive, discovery interview">Honestly? I'd just message my CSM and ask who owns the account at AWS. Half the time the name they gave me had already switched teams.</Quote>
+            <Callout label="Insight">The data to solve this already existed in our system, historical co-sell outcomes, account coverage mappings, domain associations. We just weren't surfacing it.</Callout>
           </div>
 
           <div>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '22px', marginBottom: '12px', color: 'var(--ink)' }}>Phase 2: What happens after the call?</h3>
             <Body>Sellers who worked with resellers and channel partners had no unified view of those relationships. CPPOs were in the Offers tab. Co-sells were in the Co-Sell tab. Shared accounts were buried in Account Mapping. Revenue attributed to a partner required manual cross-referencing across four different pages.</Body>
-            <Callout label="The connection">I didn't design Contact List and PRM as two separate projects. Contact List revealed the problem that PRM solved. The same data gap — contacts scattered, relationships untracked, revenue unattributed — existed at both the individual and company level. Solving one without the other would have left sellers with half the picture.</Callout>
+            <Callout label="The connection">I didn't design Contact List and PRM as two separate projects. Contact List revealed the problem that PRM solved. The same data gap, contacts scattered, relationships untracked, revenue unattributed, existed at both the individual and company level. Solving one without the other would have left sellers with half the picture.</Callout>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', margin: '32px 0' }}>
             <div style={{ background: '#fff5f5', border: '1px solid #fecaca', borderRadius: '10px', padding: '20px' }}>
-              <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#ef4444', marginBottom: '16px' }}>Before — Data by Type</div>
+              <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#ef4444', marginBottom: '16px' }}>Before, Data by Type</div>
               {[
                 'Offers tab → CPPOs',
                 'Co-Sell tab → Referrals',
@@ -849,7 +1329,7 @@ function SugerCaseStudy() {
               <div style={{ fontSize: '12px', color: '#ef4444', marginTop: '12px' }}>4 pages to understand 1 partner relationship</div>
             </div>
             <div style={{ background: '#f0fdf4', border: '1px solid #86efac', borderRadius: '10px', padding: '20px' }}>
-              <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#166534', marginBottom: '16px' }}>After — Data by Partner</div>
+              <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', textTransform: 'uppercase', color: '#166534', marginBottom: '16px' }}>After, Data by Partner</div>
               <div style={{ background: 'var(--accent)', borderRadius: '8px', padding: '16px', color: 'white' }}>
                 <div style={{ fontSize: '14px', fontWeight: '700', marginBottom: '12px' }}>Acme Resellers</div>
                 <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
@@ -865,13 +1345,13 @@ function SugerCaseStudy() {
 
         {/* Discovery */}
         <Section id="discovery" label="03 · Discovery">
-          <H2>Understanding the space before designing</H2>
-          <Body>Before touching Figma, Gabriel (PM) and I researched how existing PRM tools approached these problems — and where they failed. We looked closely at Euler, Impartner, and Crossbeam/PartnerTap.</Body>
+          <H2>Before opening Figma, we studied how every existing PRM tool solved this, and found the gap they all left open.</H2>
+          <Body>Before touching Figma, Gabriel (PM) and I researched how existing PRM tools approached these problems, and where they failed. We looked closely at Euler, Impartner, and Crossbeam/PartnerTap.</Body>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '16px', margin: '32px 0' }}>
             {[
               { tool: 'Impartner', finding: 'Feature-complete but requires partners to log in before sellers get value. Partner adoption kills adoption.' },
-              { tool: 'Euler', finding: 'Strong dashboard pattern (KPI cards + leading partners chart). But handles payments — out of our scope entirely.' },
+              { tool: 'Euler', finding: 'Strong dashboard pattern (KPI cards + leading partners chart). But handles payments, out of our scope entirely.' },
               { tool: 'Crossbeam', finding: 'Built on account mapping ("which accounts does this partner know?"). We already had that data in our backend.' },
             ].map(({ tool, finding }) => (
               <div key={tool} style={{ padding: '20px', background: 'var(--white)', borderRadius: '10px', border: '1px solid var(--border)' }}>
@@ -905,23 +1385,27 @@ function SugerCaseStudy() {
               </div>
             ))}
           </div>
+
+          <ProductMedia src="/case-studies/prm/product/deal-registration.mp4" caption="Deal registration, one of the partner surfaces I co-designed with Gabriel (PM)" />
         </Section>
 
         {/* Contact List */}
-        <Section id="contact-list" label="04 · Design — Contact List">
-          <H2>Solving the "who do I call?" problem</H2>
-          <Body>Contact List was a new product surface I designed from scratch — a structured, filterable view of cloud contacts enriched with AI-predicted signals to help sellers identify the right person to engage for a specific deal.</Body>
+        <Section id="contact-list" label="04 · Design, Contact List">
+          <H2>On paper, the assignment was simple: give sellers a filterable list of cloud contacts so they'd stop guessing at names.</H2>
+          <Body>Contact List was a new product surface I designed from scratch, a structured, filterable view of cloud contacts enriched with AI-predicted signals to help sellers identify the right person to engage for a specific deal.</Body>
           <Body>The core table handled three user types (cloud reps, buyers, and partners) with 14 columns: Name, Source, Role, Cloud Partner, Managed Domains, Industries, Owners, Region, Coverage Location, # of Accounts, Open Pipeline, Closed Won, Success Rate, and Last Updated.</Body>
 
           <div style={{ margin: '40px 0' }}>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '16px', color: 'var(--ink)' }}>The AI confidence design challenge</h3>
             <Body>The most interesting decision: how much AI intelligence do we surface to the user? Our backend predicted relevant contacts based on historical co-sell outcomes and account overlap. The question was what to show.</Body>
             <ExplorationTable rows={[
-              { option: 'Option A: Confidence scores', rationale: 'Show a numeric score (e.g. "87% match") next to each predicted contact, letting sellers evaluate prediction quality.', decision: 'Rejected — cognitive overhead. Sellers act on names, not probabilities.', verdict: 'rejected' },
-              { option: 'Option B: Source badges only', rationale: 'Show where each contact came from (Predicted, Referral, Uploaded) without a score. Tells sellers why without asking them to evaluate.', decision: 'Adopted — balanced signal, low friction.', verdict: 'adopted' },
-              { option: 'Option C: No AI signals', rationale: 'Clean list with no provenance indicators. Simpler UI but sellers lose trust — they can\'t tell which contacts are reliable vs. guessed.', decision: 'Rejected — breaks trust in the data.', verdict: 'rejected' },
+              { option: 'Option A: Confidence scores', rationale: 'Show a numeric score (e.g. "87% match") next to each predicted contact, letting sellers evaluate prediction quality.', decision: 'Rejected, cognitive overhead. Sellers act on names, not probabilities.', verdict: 'rejected' },
+              { option: 'Option B: Source badges only', rationale: 'Show where each contact came from (Predicted, Referral, Uploaded) without a score. Tells sellers why without asking them to evaluate.', decision: 'Adopted, balanced signal, low friction.', verdict: 'adopted' },
+              { option: 'Option C: No AI signals', rationale: 'Clean list with no provenance indicators. Simpler UI but sellers lose trust, they can\'t tell which contacts are reliable vs. guessed.', decision: 'Rejected, breaks trust in the data.', verdict: 'rejected' },
             ]} />
             <Body>The confidence score lived in the backend and informed ranking. But we deliberately didn't expose the number in the UI. The 'Predicted' badge (yellow) and 'Referral' badge (green) gave sellers enough signal to calibrate trust without adding a number they'd have to interpret.</Body>
+            <Quote cite="Channel Manager, discovery interview">I don't want a match percentage. I want to know if this is the person who actually closed deals that look like mine.</Quote>
+            <Callout label="Stakeholder tension">The hardest disagreement wasn't about layout. Sellers wanted the list clean and act-on-able, so we hid the score. Cloud reps, who saw the same accounts surfaced to them, wanted to know why an account was flagged before they'd trust it. One audience's clarity was the other's missing context. Phase 1 optimized for the seller, and that trade is one I call out again in the reflection.</Callout>
           </div>
 
           <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '32px', margin: '32px 0' }}>
@@ -985,37 +1469,37 @@ function SugerCaseStudy() {
                 );
               })}
             </div>
-            <div style={{ fontSize: '12px', color: 'var(--ink-muted)', textAlign: 'center', marginTop: '8px' }}>Contact List — 14-column table with AI source badges (Predicted, Referral, Uploaded)</div>
+            <div style={{ fontSize: '12px', color: 'var(--ink-muted)', textAlign: 'center', marginTop: '8px' }}>Contact List, 14-column table with AI source badges (Predicted, Referral, Uploaded)</div>
           </div>
         </Section>
 
         {/* PRM */}
-        <Section id="prm" label="05 · Design — Partner Relationship Management">
-          <H2>Organizing data by partner, not by transaction type</H2>
-          <Body>PRM Phase 1 was the bigger design challenge — not because individual components were complex, but because the architectural decision about how to organize partner data would shape every surface downstream.</Body>
+        <Section id="prm" label="05 · Design, PRM">
+          <H2>The core decision wasn't visual. It was whether to keep organizing partner data by transaction type, the way the product already did, or rebuild it around the partner.</H2>
+          <Body>PRM Phase 1 was the bigger design challenge, not because individual components were complex, but because the architectural decision about how to organize partner data would shape every surface downstream.</Body>
 
           <ExplorationTable rows={[
-            { option: 'Organized by type (current)', rationale: 'Offers tab shows all CPPOs. Co-Sell tab shows all referrals. Sellers must mentally join these to understand one partner relationship.', decision: 'Current state — too much cognitive load across four pages.', verdict: 'rejected' },
-            { option: 'Organized by partner (new)', rationale: 'One Partner Profile shows all CPPOs, co-sells, shared accounts, revenue, and timeline for a specific partner company.', decision: 'Adopted — partner-centric model.', verdict: 'adopted' },
+            { option: 'Organized by type (current)', rationale: 'Offers tab shows all CPPOs. Co-Sell tab shows all referrals. Sellers must mentally join these to understand one partner relationship.', decision: 'Current state, too much cognitive load across four pages.', verdict: 'rejected' },
+            { option: 'Organized by partner (new)', rationale: 'One Partner Profile shows all CPPOs, co-sells, shared accounts, revenue, and timeline for a specific partner company.', decision: 'Adopted, partner-centric model.', verdict: 'adopted' },
           ]} />
 
           <div style={{ margin: '40px 0' }}>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '16px', color: 'var(--ink)' }}>Partner Profile design decisions</h3>
             <ExplorationTable rows={[
-              { option: 'Long scroll', rationale: 'All five sections visible on one page. Easier to see everything but overwhelming for quick lookups.', decision: 'Rejected — too dense.', verdict: 'rejected' },
-              { option: 'Horizontal tabs', rationale: 'Each section in its own tab. Clean but hides context — sellers can\'t see CPPO activity while reviewing co-sells.', decision: 'Partial — used for sub-sections only.', verdict: 'partial' },
-              { option: 'Anchored sections', rationale: 'Sections stacked with sticky section navigation. Sellers can scroll or jump. Balances density with discoverability.', decision: 'Adopted — best of both.', verdict: 'adopted' },
+              { option: 'Long scroll', rationale: 'All five sections visible on one page. Easier to see everything but overwhelming for quick lookups.', decision: 'Rejected, too dense.', verdict: 'rejected' },
+              { option: 'Horizontal tabs', rationale: 'Each section in its own tab. Clean but hides context, sellers can\'t see CPPO activity while reviewing co-sells.', decision: 'Partial, used for sub-sections only.', verdict: 'partial' },
+              { option: 'Anchored sections', rationale: 'Sections stacked with sticky section navigation. Sellers can scroll or jump. Balances density with discoverability.', decision: 'Adopted, best of both.', verdict: 'adopted' },
             ]} />
           </div>
 
           <div style={{ margin: '40px 0' }}>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '12px', color: 'var(--ink)' }}>AI Partner Overview card</h3>
-            <Body>An auto-scraped, AI-generated summary of the partner company — specializations, key products, target industries, known customers — updated periodically in the background. Reduces the prep work sellers do before a partner QBR without requiring any manual data entry.</Body>
+            <Body>An auto-scraped, AI-generated summary of the partner company, specializations, key products, target industries, known customers, updated periodically in the background. Reduces the prep work sellers do before a partner QBR without requiring any manual data entry.</Body>
           </div>
 
           <div style={{ margin: '40px 0' }}>
             <h3 style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '12px', color: 'var(--ink)' }}>The Shadow Partner problem</h3>
-            <Body>In Phase 1, all partners are "shadow partners" — they exist in Suger derived from transaction data but have no Suger login and potentially inconsistent names across CPPOs and co-sells. This shaped every design decision: every section needed a graceful degraded state, domain matching as primary key, and a "Possible duplicate" indicator for partners with >90% name similarity.</Body>
+            <Body>In Phase 1, all partners are "shadow partners", they exist in Suger derived from transaction data but have no Suger login and potentially inconsistent names across CPPOs and co-sells. This shaped every design decision: every section needed a graceful degraded state, domain matching as primary key, and a "Possible duplicate" indicator for partners with >90% name similarity.</Body>
           </div>
 
           <div style={{ margin: '0 0 32px' }}>
@@ -1083,8 +1567,15 @@ function SugerCaseStudy() {
                 </div>
               </div>
             </div>
-            <div style={{ fontSize: '12px', color: 'var(--ink-muted)', textAlign: 'center', marginTop: '8px' }}>Partner Profile — Revenue metrics, AI overview, and basic information panel</div>
+            <div style={{ fontSize: '12px', color: 'var(--ink-muted)', textAlign: 'center', marginTop: '8px' }}>Partner Profile, Revenue metrics, AI overview, and basic information panel</div>
           </div>
+
+          <div style={{ margin: '40px 0' }}>
+            <h3 style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '12px', color: 'var(--ink)' }}>Designing for an offshore build</h3>
+            <Body>The engineering team building PRM sat in China, several time zones from the US design team, so I couldn't lean on hallway conversations to fill gaps in a spec. I designed every surface to stand on its own: explicit empty, loading, and error states, exact column and sort behavior, and redline-level spacing, so a screen could be built correctly without a synchronous back and forth. Co-designing the data surfaces with Gabriel (PM) up front meant the handoff carried the reasoning behind each decision, not just the pixels.</Body>
+          </div>
+
+          <ProductMedia src="/case-studies/prm/product/partner-revenue.png" caption="Partner revenue view, co-designed with Gabriel (PM)" />
 
           {/* Prototype → Production transition */}
           <div style={{ fontSize: '13px', fontWeight: '600', color: 'var(--ink)', marginBottom: '16px' }}>From early prototype to production</div>
@@ -1092,7 +1583,7 @@ function SugerCaseStudy() {
             <div style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '24px' }}>
               <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', color: 'var(--ink-muted)', textTransform: 'uppercase', marginBottom: '10px' }}>① Early · Lovable</div>
               <div style={{ fontSize: '15px', fontWeight: '700', color: 'var(--ink)', marginBottom: '6px' }}>Structural prototype</div>
-              <div style={{ fontSize: '13px', color: 'var(--ink-soft)', lineHeight: '1.6', marginBottom: '14px' }}>I used Lovable to validate the information architecture and core flows fast — before committing to high-fidelity design.</div>
+              <div style={{ fontSize: '13px', color: 'var(--ink-soft)', lineHeight: '1.6', marginBottom: '14px' }}>I used Lovable to validate the information architecture and core flows fast, before committing to high-fidelity design.</div>
               <a href="https://suger-prm.lovable.app" target="_blank" rel="noreferrer" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: '600', color: 'var(--accent)' }}>View early prototype ↗</a>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px', color: 'var(--ink-muted)' }}>→</div>
@@ -1104,12 +1595,12 @@ function SugerCaseStudy() {
           </div>
         </Section>
 
-        {/* Prototype — Partner Discovery & Collaborations */}
+        {/* Prototype, Partner Discovery & Collaborations */}
         <PartnerDiscoverySection />
 
         {/* The System */}
         <Section id="system" label="07 · The System">
-          <H2>How Contact List and PRM connect</H2>
+          <H2>Contact List and PRM were never two projects. They're the same problem at different altitudes, running on one shared data layer.</H2>
           <Body>These weren't two separate projects. They're the same problem at different levels of abstraction.</Body>
 
           <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--ink)', marginBottom: '20px', marginTop: '24px' }}>How data flows between Contact List and PRM</div>
@@ -1177,14 +1668,16 @@ function SugerCaseStudy() {
 
         {/* Impact */}
         <Section id="impact" label="08 · Impact">
-          <H2>Design decisions that moved the needle</H2>
+          <H2>Phase 1 is still shipping, so rather than project metrics I can't yet defend, I'm showing the design decisions themselves, and the outcome each one is built to move.</H2>
           <Body>PRM Phase 1 is in active development. Rather than projecting metrics, here are the concrete, defensible impacts of the design decisions themselves.</Body>
+
+          <ProductMedia src="/case-studies/prm/product/partner-analytics.png" caption="Partner analytics view, co-designed with Gabriel (PM)" />
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', margin: '32px 0' }}>
             {[
               { symbol: '4→1', title: 'Pages collapsed into one', desc: 'Reorganizing by partner instead of transaction type meant sellers no longer needed to cross-reference Offers, Co-Sell, Agreements, and Account Mapping to understand one partner relationship.' },
               { symbol: '0', title: 'Partner signups required for Day 1 value', desc: 'Every competing PRM tool requires partner adoption before sellers get value. Phase 1 delivers full seller intelligence from existing marketplace transaction data alone.' },
-              { symbol: '✦', title: 'AI that works in the background', desc: 'The AI Partner Overview card auto-scrapes company intelligence so sellers arrive at partner QBRs prepared — without any manual data entry or research.' },
+              { symbol: '✦', title: 'AI that works in the background', desc: 'The AI Partner Overview card auto-scrapes company intelligence so sellers arrive at partner QBRs prepared, without any manual data entry or research.' },
               { symbol: '3', title: 'Interaction patterns reused across surfaces', desc: 'The Share Portal UX pattern built for Contact List was extended directly into PRM. The account mapping backend powers both contact predictions and partner shared accounts.' },
             ].map(({ symbol, title, desc }) => (
               <div key={title} style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '28px', display: 'grid', gridTemplateColumns: '80px 1fr', gap: '20px', alignItems: 'flex-start' }}>
@@ -1199,7 +1692,7 @@ function SugerCaseStudy() {
 
           <div style={{ background: 'var(--accent-light)', borderRadius: '10px', padding: '20px 24px', display: 'flex', gap: '32px', flexWrap: 'wrap' }}>
             {[
-              { label: 'Scope discipline', text: "Cutting 6 out of 10 potential features wasn't limiting — it made Phase 1 shippable in 4 weeks." },
+              { label: 'Scope discipline', text: "Cutting 6 out of 10 potential features wasn't limiting, it made Phase 1 shippable in 4 weeks." },
               { label: 'Data before design', text: 'The best design decision was realizing we already had all the data we needed. We just needed to reorganize it.' },
               { label: 'Systems over features', text: 'Designing Contact List and PRM as connected surfaces, not separate projects, made both stronger.' },
             ].map(({ label, text }) => (
@@ -1209,18 +1702,62 @@ function SugerCaseStudy() {
               </div>
             ))}
           </div>
+
+          <div style={{ margin: '40px 0 0' }}>
+            <h3 style={{ fontFamily: 'var(--serif)', fontSize: '20px', marginBottom: '6px', color: 'var(--ink)' }}>How we'll measure Phase 1</h3>
+            <div style={{ fontSize: '13px', color: 'var(--ink-muted)', marginBottom: '20px' }}>These are the targets Phase 1 is designed to move, not results. The feature is still shipping.</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+              {[
+                { metric: 'Contact accuracy', target: 'At least 80% of predicted contacts confirmed as the right person to engage' },
+                { metric: 'Time-to-contact', target: 'Cut the time from opportunity to first partner touch by half' },
+                { metric: 'Partner-view adoption', target: '60% of active co-sell sellers open a Partner Profile each month' },
+                { metric: 'Attribution coverage', target: '90% of partner-sourced revenue auto-attributed, with no manual cross-referencing' },
+              ].map(({ metric, target }) => (
+                <div key={metric} style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--accent)', background: 'var(--accent-light)', padding: '2px 8px', borderRadius: '100px' }}>Target</span>
+                    <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--ink)' }}>{metric}</span>
+                  </div>
+                  <div style={{ fontSize: '13px', color: 'var(--ink-soft)', lineHeight: '1.6' }}>{target}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </Section>
+
+        {/* What's Next */}
+        <Section id="next" label="09 · What's Next">
+          <H2>Phase 1 earns the right to build the rest: the surfaces that turn a seller-only view into a two-sided partner platform.</H2>
+          <Body>Everything in Phase 1 runs on data Suger already has, with no partner login required. That was the constraint that made it shippable, and it's also the launch pad. Once sellers trust the partner view, the roadmap opens up the surfaces that need partners in the loop, and the ones that turn tracking into action.</Body>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '40px', margin: '32px 0 0' }}>
+            {[
+              { tag: 'Next', title: 'Commission plans', body: 'Model and track partner commissions against real marketplace transactions, so revenue share stops living in spreadsheets and reconciles against the same data the Partner Profile already shows.', src: '/case-studies/prm/product/commission-plans.mp4' },
+              { tag: 'Later', title: 'White-label partner portal', body: 'The two-sided step: give partners their own branded login to see shared pipeline and co-sell status. This is the moment PRM stops being seller-only, so the Phase 1 shadow-partner model was designed to graduate into real partner accounts without a rebuild.', src: '/case-studies/prm/product/white-label-portal.mp4' },
+              { tag: 'Later', title: 'Partner LMS', body: 'Enablement and certification tracking inside the portal, so partner readiness becomes a signal sellers can act on alongside revenue and account overlap.', src: '/case-studies/prm/product/partner-lms.mp4' },
+            ].map(({ tag, title, body, src }) => (
+              <div key={title}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '8px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: '700', letterSpacing: '0.06em', textTransform: 'uppercase', color: 'var(--accent)', background: 'var(--accent-light)', padding: '2px 8px', borderRadius: '100px' }}>{tag}</span>
+                  <h3 style={{ fontFamily: 'var(--serif)', fontSize: '22px', color: 'var(--ink)', margin: 0 }}>{title}</h3>
+                </div>
+                <Body>{body}</Body>
+                <ProductMedia src={src} caption={title} />
+              </div>
+            ))}
+          </div>
         </Section>
 
         {/* AI Tools */}
-        <Section id="ai-tools" label="09 · AI in My Workflow">
-          <H2>How I used AI tools throughout this project</H2>
+        <Section id="ai-tools" label="10 · AI in My Workflow">
+          <H2>I leaned on AI tools deliberately throughout, to move faster on exploration without handing over the design decisions.</H2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', margin: '24px 0' }}>
             {[
               { tool: 'Claude Code', use: 'Rapid prototyping and portfolio rebuild. Used to generate and iterate on front-end components without blocking on dev cycles.' },
               { tool: 'Lovable', use: 'Built the PRM structural prototype to validate information architecture before committing to high-fidelity design.' },
               { tool: 'Figma Make', use: 'Prompt-driven component iteration. Useful for quickly generating layout variations to test with stakeholders.' },
-              { tool: 'Google Stitch', use: 'Connection Hub panel design — drafted prompts that I ran myself to maintain design ownership while moving fast.' },
-              { tool: 'Claude (API)', use: 'AI Partner Overview card — auto-scraped and summarized partner company intelligence directly in the product.' },
+              { tool: 'Google Stitch', use: 'Connection Hub panel design, drafted prompts that I ran myself to maintain design ownership while moving fast.' },
+              { tool: 'Claude (API)', use: 'AI Partner Overview card, auto-scraped and summarized partner company intelligence directly in the product.' },
               { tool: 'Cursor', use: 'Code-adjacent design work. Helped iterate on design specs and technical documentation faster.' },
             ].map(({ tool, use }) => (
               <div key={tool} style={{ padding: '20px', background: 'var(--white)', borderRadius: '10px', border: '1px solid var(--border)' }}>
@@ -1232,11 +1769,11 @@ function SugerCaseStudy() {
         </Section>
 
         {/* Reflection */}
-        <Section id="reflection" label="10 · Reflection">
-          <H2>What I'd do differently</H2>
+        <Section id="reflection" label="11 · Reflection">
+          <H2>Looking back, three things I'd do differently, most of them about messiness I underestimated going in.</H2>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', margin: '24px 0' }}>
             {[
-              { title: 'Involve cloud reps earlier', body: 'We designed primarily from the seller\'s perspective. Post-launch, cloud reps wanted more context about why accounts were highlighted — a confidence signal we removed from the seller-facing view.' },
+              { title: 'Involve cloud reps earlier', body: 'We designed primarily from the seller\'s perspective. Post-launch, cloud reps wanted more context about why accounts were highlighted, a confidence signal we removed from the seller-facing view.' },
               { title: 'Default view for the 14-column table', body: 'Correct for power users but overwhelming for first-time users. I\'d add a "Recommended columns" default showing only the 6-7 most used, with the full 14 via column picker.' },
               { title: 'More time on shadow partner deduplication', body: 'I underestimated how messy partner identity data would be. More time on the data model edge cases early would have saved iteration cycles on the Partner List view.' },
             ].map(({ title, body }) => (
