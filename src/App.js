@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import TaxManagementCaseStudy from './TaxManagementCaseStudy';
+import NarrativeCaseStudy from './NarrativeCaseStudy';
+import revvityData from './caseStudies/revvity';
 import { CaseStudyNav } from './caseStudyNav';
 
 // ── GLOBAL STYLES ──────────────────────────────────────────
@@ -199,8 +201,8 @@ const projects = [
     color: '#1A4D2E',
     bgColor: '#E8F5EC',
     image: '/thumbs/revvity.jpg',
-    link: 'https://samanthaho-productdesigner.framer.website/revvity',
-    live: false,
+    link: '/case-study/revvity',
+    live: true,
   },
   {
     id: 'crypto',
@@ -1675,9 +1677,9 @@ function SugerCaseStudy() {
           <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--ink-soft)', fontWeight: '500' }}>
             ← All Work
           </Link>
-          <a href="https://samanthaho-productdesigner.framer.website/revvity" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--ink)', fontWeight: '500' }}>
+          <Link to="/case-study/revvity" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '14px', color: 'var(--ink)', fontWeight: '500' }}>
             Next: Revvity Homogenizer →
-          </a>
+          </Link>
         </div>
           </div>
         </div>
@@ -1698,6 +1700,7 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/case-study/suger-prm" element={<SugerCaseStudy />} />
           <Route path="/case-study/tax-management" element={<TaxManagementCaseStudy />} />
+          <Route path="/case-study/revvity" element={<NarrativeCaseStudy data={revvityData} />} />
         </Routes>
       </BrowserRouter>
     </>
