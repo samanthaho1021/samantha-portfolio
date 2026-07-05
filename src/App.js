@@ -106,23 +106,22 @@ const globalStyles = `
   @media (max-width: 900px) { .home-inner { padding: 0 24px; } }
 
   .green-band { background: var(--accent); }
-  .band-work { clip-path: polygon(0 170px, 100% 0, 100% calc(100% - 90px), 0 100%); }
-  .band-footer { clip-path: polygon(0 0, 100% 100px, 100% 100%, 0 100%); }
+  .band-work { clip-path: polygon(0 0, 100% 200px, 100% 100%, 0 calc(100% - 120px)); }
+  .band-footer { clip-path: polygon(0 110px, 100% 0, 100% 100%, 0 100%); }
   @media (max-width: 720px) {
-    .band-work { clip-path: polygon(0 70px, 100% 0, 100% calc(100% - 40px), 0 100%); }
-    .band-footer { clip-path: polygon(0 0, 100% 44px, 100% 100%, 0 100%); }
+    .band-work { clip-path: polygon(0 0, 100% 80px, 100% 100%, 0 calc(100% - 48px)); }
+    .band-footer { clip-path: polygon(0 48px, 100% 0, 100% 100%, 0 100%); }
   }
 
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
   .reveal.in-view { opacity: 1; transform: none; }
 
   @keyframes spin360 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  .flower { display: inline-block; vertical-align: baseline; }
-  .flower.in-view { animation: spin360 1.1s ease-out; }
+  .flower { display: inline-block; vertical-align: baseline; animation: spin360 5s linear infinite; }
 
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
-    .flower.in-view { animation: none; }
+    .flower { animation: none; }
   }
 
   /* Case study: two-up comparison (before/after, image+prompts) */
@@ -393,23 +392,24 @@ function ProjectCard({ project }) {
 }
 
 // Reveals its children (slide up + fade) the first time they scroll into view.
-function useInView(threshold = 0.15) {
+function useInView(threshold = 0.15, repeat = false) {
   const ref = useRef(null);
   const [seen, setSeen] = useState(false);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const obs = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) { setSeen(true); obs.disconnect(); }
+      if (e.isIntersecting) { setSeen(true); if (!repeat) obs.disconnect(); }
+      else if (repeat) { setSeen(false); }
     }, { threshold });
     obs.observe(el);
     return () => obs.disconnect();
-  }, [threshold]);
+  }, [threshold, repeat]);
   return [ref, seen];
 }
 
-function Reveal({ children, delay = 0, style }) {
-  const [ref, seen] = useInView();
+function Reveal({ children, delay = 0, style, repeat = false }) {
+  const [ref, seen] = useInView(0.15, repeat);
   return (
     <div ref={ref} className={`reveal ${seen ? 'in-view' : ''}`} style={{ transitionDelay: `${delay}ms`, ...style }}>
       {children}
@@ -417,11 +417,10 @@ function Reveal({ children, delay = 0, style }) {
   );
 }
 
-// Hand-drawn-style flower that spins once when it scrolls into view.
+// Hand-drawn-style flower that spins continuously.
 function Flower() {
-  const [ref, seen] = useInView(0.2);
   return (
-    <span ref={ref} className={`flower ${seen ? 'in-view' : ''}`} aria-hidden="true"
+    <span className="flower" aria-hidden="true"
           style={{ width: '0.82em', height: '0.82em', margin: '0 0.14em' }}>
       <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', display: 'block', overflow: 'visible' }}>
         <g fill="var(--accent)">
@@ -439,7 +438,7 @@ function HomePage() {
   return (
     <>
       {/* Hero (beige) */}
-      <section className="home-inner" style={{ paddingTop: '140px', paddingBottom: '40px', position: 'relative', zIndex: 1 }}>
+      <section className="home-inner" style={{ paddingTop: '140px', paddingBottom: '64px', position: 'relative', zIndex: 1 }}>
       <div style={{ marginBottom: '0' }}>
         <div className="fade-up stagger-1" style={{
           display: 'inline-block',
@@ -498,9 +497,10 @@ function HomePage() {
 
       </section>
 
-      {/* Selected Work — diagonal green band rising into the hero (slopes up-right),
-          ending diagonally around the middle cards */}
-      <section className="green-band band-work" style={{ paddingTop: '200px', paddingBottom: '72px', marginTop: '-120px' }}>
+      {/* Selected Work — diagonal green band (slopes down to the right), slides in on
+          scroll, ending diagonally around the middle cards */}
+      <Reveal repeat style={{ marginTop: '-8px' }}>
+      <section className="green-band band-work" style={{ paddingTop: '156px', paddingBottom: '96px' }}>
         <div className="home-inner">
           <Reveal>
             <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'rgba(250,248,245,0.72)', textTransform: 'uppercase', marginBottom: '32px' }}>
@@ -516,6 +516,7 @@ function HomePage() {
           </div>
         </div>
       </section>
+      </Reveal>
 
       {/* Remaining work on beige */}
       <section className="home-inner" style={{ paddingTop: '56px', paddingBottom: '96px' }}>
