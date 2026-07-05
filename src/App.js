@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import TaxManagementCaseStudy from './TaxManagementCaseStudy';
 import NarrativeCaseStudy from './NarrativeCaseStudy';
@@ -98,6 +98,31 @@ const globalStyles = `
   .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
   @media (max-width: 720px) {
     .work-grid { grid-template-columns: 1fr; }
+  }
+
+  /* Home page: diagonal green bands + scroll reveal + flower */
+  .home-inner { padding: 0 280px; }
+  @media (max-width: 1100px) { .home-inner { padding: 0 100px; } }
+  @media (max-width: 900px) { .home-inner { padding: 0 24px; } }
+
+  .green-band { background: var(--accent); }
+  .band-work { clip-path: polygon(0 60px, 100% 0, 100% calc(100% - 60px), 0 100%); }
+  .band-footer { clip-path: polygon(0 0, 100% 60px, 100% 100%, 0 100%); }
+  @media (max-width: 720px) {
+    .band-work { clip-path: polygon(0 28px, 100% 0, 100% calc(100% - 28px), 0 100%); }
+    .band-footer { clip-path: polygon(0 0, 100% 28px, 100% 100%, 0 100%); }
+  }
+
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in-view { opacity: 1; transform: none; }
+
+  @keyframes spin360 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  .flower { display: inline-block; vertical-align: baseline; }
+  .flower.in-view { animation: spin360 1.1s ease-out; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .flower.in-view { animation: none; }
   }
 
   /* Case study: two-up comparison (before/after, image+prompts) */
@@ -367,11 +392,55 @@ function ProjectCard({ project }) {
   return <a href={project.link} target="_blank" rel="noreferrer" style={linkStyle}>{content}</a>;
 }
 
+// Reveals its children (slide up + fade) the first time they scroll into view.
+function useInView(threshold = 0.15) {
+  const ref = useRef(null);
+  const [seen, setSeen] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) { setSeen(true); obs.disconnect(); }
+    }, { threshold });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, [threshold]);
+  return [ref, seen];
+}
+
+function Reveal({ children, delay = 0, style }) {
+  const [ref, seen] = useInView();
+  return (
+    <div ref={ref} className={`reveal ${seen ? 'in-view' : ''}`} style={{ transitionDelay: `${delay}ms`, ...style }}>
+      {children}
+    </div>
+  );
+}
+
+// Hand-drawn-style flower that spins once when it scrolls into view.
+function Flower() {
+  const [ref, seen] = useInView(0.2);
+  return (
+    <span ref={ref} className={`flower ${seen ? 'in-view' : ''}`} aria-hidden="true"
+          style={{ width: '0.82em', height: '0.82em', margin: '0 0.14em' }}>
+      <svg viewBox="0 0 100 100" style={{ width: '100%', height: '100%', display: 'block', overflow: 'visible' }}>
+        <g fill="var(--accent)">
+          {[0, 72, 144, 216, 288].map(a => (
+            <ellipse key={a} cx="50" cy="27" rx="13" ry="20" transform={`rotate(${a} 50 50)`} />
+          ))}
+        </g>
+        <circle cx="50" cy="50" r="11" fill="#E8A33D" />
+      </svg>
+    </span>
+  );
+}
+
 function HomePage() {
   return (
-    <div className="page-body">
-      {/* Hero */}
-      <div style={{ marginBottom: '80px' }}>
+    <>
+      {/* Hero (beige) */}
+      <section className="home-inner" style={{ paddingTop: '140px', paddingBottom: '96px' }}>
+      <div style={{ marginBottom: '0' }}>
         <div className="fade-up stagger-1" style={{
           display: 'inline-block',
           fontSize: '12px',
@@ -394,7 +463,7 @@ function HomePage() {
           marginBottom: '24px',
           color: 'var(--ink)',
         }}>
-          Hi, I'm Samantha Ho, a design-led<br />
+          Hi, I'm Samantha Ho<Flower />, a design-led<br />
           <span style={{ color: 'var(--accent)' }}>product manager</span> taking complex<br />
           B2B SaaS from problem to launch.
         </h1>
@@ -427,33 +496,47 @@ function HomePage() {
         </div>
       </div>
 
-      {/* Projects */}
-      <div className="fade-up stagger-5">
-        <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'var(--ink-muted)', textTransform: 'uppercase', marginBottom: '24px' }}>
-          Selected Work
-        </div>
-        <div className="work-grid">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
-      </div>
+      </section>
 
-      {/* Footer */}
-      <div style={{ marginTop: '80px', paddingTop: '40px', borderTop: '1px solid var(--border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-        <div style={{ fontFamily: 'var(--serif)', fontSize: '16px', color: 'var(--ink-soft)' }}>
-          Samantha Ho
+      {/* Selected Work — diagonal green band (slopes up to the right) */}
+      <section className="green-band band-work" style={{ paddingTop: '128px', paddingBottom: '128px', marginTop: '-40px' }}>
+        <div className="home-inner">
+          <Reveal>
+            <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'rgba(250,248,245,0.72)', textTransform: 'uppercase', marginBottom: '32px' }}>
+              Selected Work
+            </div>
+          </Reveal>
+          <div className="work-grid">
+            {projects.map((project, i) => (
+              <Reveal key={project.id} delay={i * 80}>
+                <ProjectCard project={project} />
+              </Reveal>
+            ))}
+          </div>
         </div>
-        <div style={{ display: 'flex', gap: '24px' }}>
-          <a href="mailto:samanthaho1021@gmail.com" style={{ fontSize: '13px', color: 'var(--ink-soft)', transition: 'color 0.2s' }}>
-            samanthaho1021@gmail.com
-          </a>
-          <a href="https://www.linkedin.com/in/samantha-ho-uxdesigner/" target="_blank" rel="noreferrer" style={{ fontSize: '13px', color: 'var(--ink-soft)' }}>
-            LinkedIn ↗
-          </a>
+      </section>
+
+      {/* Footer — diagonal green band (slopes the opposite way) */}
+      <section className="green-band band-footer" style={{ paddingTop: '116px', paddingBottom: '72px', marginTop: '-48px' }}>
+        <div className="home-inner">
+          <Reveal>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+              <div style={{ fontFamily: 'var(--serif)', fontSize: '18px', color: 'var(--bg)' }}>
+                Samantha Ho
+              </div>
+              <div style={{ display: 'flex', gap: '24px' }}>
+                <a href="mailto:samanthaho1021@gmail.com" style={{ fontSize: '13px', color: 'rgba(250,248,245,0.85)' }}>
+                  samanthaho1021@gmail.com
+                </a>
+                <a href="https://www.linkedin.com/in/samantha-ho-uxdesigner/" target="_blank" rel="noreferrer" style={{ fontSize: '13px', color: 'rgba(250,248,245,0.85)' }}>
+                  LinkedIn ↗
+                </a>
+              </div>
+            </div>
+          </Reveal>
         </div>
-      </div>
-    </div>
+      </section>
+    </>
   );
 }
 
