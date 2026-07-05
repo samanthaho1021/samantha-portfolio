@@ -105,6 +105,12 @@ const globalStyles = `
   @media (max-width: 720px) {
     .cs-2col { grid-template-columns: 1fr; }
   }
+
+  /* About: bio text + portrait */
+  .about-bio { display: grid; grid-template-columns: 1.5fr 1fr; gap: 40px; align-items: start; }
+  @media (max-width: 720px) {
+    .about-bio { grid-template-columns: 1fr; }
+  }
 `;
 
 // ── NAV ────────────────────────────────────────────────────
@@ -444,53 +450,72 @@ function HomePage() {
 
 // ── ABOUT PAGE ─────────────────────────────────────────────
 function AboutPage() {
+  const IMG = '/about-media';
+  const heading = { fontFamily: 'var(--serif)', fontSize: 'clamp(24px, 3.2vw, 30px)', lineHeight: '1.25', color: 'var(--ink)', margin: '0 0 20px' };
+  const para = { fontSize: '17px', color: 'var(--ink-soft)', lineHeight: '1.8', marginBottom: '18px', fontWeight: '300' };
+  const frame = { width: '100%', display: 'block', borderRadius: '12px', border: '1px solid var(--border)', boxShadow: '0 8px 30px rgba(62,42,31,0.08)' };
+
   return (
-    <div style={{ paddingTop: '140px', maxWidth: '760px', margin: '0 auto', padding: '140px 40px 80px' }}>
-      <div className="fade-up stagger-1">
-        <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'var(--ink-muted)', textTransform: 'uppercase', marginBottom: '24px' }}>About</div>
-        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(36px, 5vw, 52px)', lineHeight: '1.15', marginBottom: '40px' }}>
-          Designer at the intersection of AI, data, and complex workflows.
+    <div style={{ paddingTop: '140px', maxWidth: '860px', margin: '0 auto', padding: '140px 40px 80px' }}>
+      <div className="fade-up stagger-1" style={{ marginBottom: '48px' }}>
+        <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'var(--ink-muted)', textTransform: 'uppercase', marginBottom: '20px' }}>About</div>
+        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(36px, 5vw, 52px)', lineHeight: '1.15', margin: 0 }}>
+          A little bit about me
         </h1>
       </div>
 
-      <div className="fade-up stagger-2" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '40px', marginBottom: '48px' }}>
+      {/* Bio + portrait */}
+      <div className="fade-up stagger-2 about-bio" style={{ marginBottom: '72px' }}>
         <div>
-          <img
-            src="https://framerusercontent.com/images/v7xJ0K5zSE2FAS8h1Cvi2lQCfY0.jpg"
-            alt="Samantha Ho"
-            style={{ width: '100%', aspectRatio: '3/4', objectFit: 'cover', borderRadius: '12px' }}
-          />
+          <p style={para}>I'm a product designer with 3+ years across B2B SaaS startups and enterprise software, spanning cloud marketplace tooling, biotech platforms, and NGO service design.</p>
+          <p style={para}>Currently at Suger, I design AI-powered features for a Cloud GTM platform used by companies selling on AWS, GCP, and Azure. I've worked directly with AWS on AI MCP feature launches, designed CRM-integrated tools like an engagement score built on Salesforce, and led the full website rebuild in under two weeks using AI-assisted development tools like Claude Code and Lovable. I'm comfortable owning design end-to-end, from shaping product scope with PMs to shipping alongside engineers in Agile workflows.</p>
+          <p style={para}>Before that, I was at Revvity, a large-scale biotech company, where I led new product initiatives, drove design-system accessibility improvements (WCAG), and streamlined workflows that reduced implementation time by 70%. That role taught me how to operate inside complex enterprise systems while keeping the user experience sharp.</p>
+          <p style={{ ...para, marginBottom: 0 }}>I hold a Master of Information in UX Design from the University of Toronto, with a focus on accessibility, research, and systems thinking. I also have a background in healthcare and have done design work with Greenpeace, which keeps me grounded in designing for real people, not just edge cases.</p>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <p style={{ fontSize: '16px', color: 'var(--ink-soft)', lineHeight: '1.8', marginBottom: '20px', fontWeight: '300' }}>
-            I'm a product designer with 3+ years across B2B SaaS startups and enterprise software — cloud marketplace tooling, biotech platforms, and NGO service design.
-          </p>
-          <p style={{ fontSize: '16px', color: 'var(--ink-soft)', lineHeight: '1.8', marginBottom: '20px', fontWeight: '300' }}>
-            Currently at Suger, I design AI-powered features for a Cloud GTM platform. I've worked directly with AWS on AI MCP feature launches, designed CRM-integrated tools, and led the full website rebuild using AI-assisted development tools.
-          </p>
-          <p style={{ fontSize: '16px', color: 'var(--ink-soft)', lineHeight: '1.8', fontWeight: '300' }}>
-            I'm comfortable owning design end-to-end — from shaping product scope with PMs to shipping alongside engineers in Agile workflows.
-          </p>
+        <div>
+          <img src={`${IMG}/portrait.jpg`} alt="Samantha Ho" loading="lazy" style={{ ...frame, aspectRatio: '3 / 4', objectFit: 'cover' }} />
         </div>
       </div>
 
-      <div className="fade-up stagger-3" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', marginBottom: '48px' }}>
-        {[
-          { label: 'Education', items: ['M.I. UX Design, University of Toronto · 2025', 'BSc Anatomy & Cell Biology, McGill · 2020'] },
-          { label: 'Currently', items: ['Product Designer @ Suger.io', 'Vancouver, BC · Open to opportunities'] },
-          { label: 'Design', items: ['Figma · PrimeOne DS · SLDS v2', 'Claude Code · Lovable · Figma Make'] },
-          { label: 'Process', items: ['Agile / Lean UX · Cross-functional', 'Research → Systems → Ship'] },
-        ].map(({ label, items }) => (
-          <div key={label} style={{ padding: '24px', background: 'var(--white)', borderRadius: '12px', border: '1px solid var(--border)' }}>
-            <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.08em', color: 'var(--accent)', textTransform: 'uppercase', marginBottom: '12px' }}>{label}</div>
-            {items.map(item => (
-              <div key={item} style={{ fontSize: '14px', color: 'var(--ink-soft)', marginBottom: '6px', lineHeight: '1.5' }}>{item}</div>
-            ))}
-          </div>
-        ))}
+      {/* How I got into UX */}
+      <div className="fade-up" style={{ marginBottom: '72px' }}>
+        <h2 style={heading}>How I got into UX</h2>
+        <p style={{ ...para, maxWidth: '740px' }}>Before becoming a designer, I worked as a disability management associate, helping employees navigate workplace accommodations and return-to-work programs. I saw firsthand how poor workflows and unclear systems could add unnecessary stress to people already facing challenges. That experience sparked my passion for designing tools and processes that remove friction, empower users, and make complex systems easier to navigate, and it ultimately led me to UX design.</p>
+        <div className="cs-2col">
+          <img src={`${IMG}/ux-1.jpg`} alt="" loading="lazy" style={frame} />
+          <img src={`${IMG}/ux-2.jpg`} alt="" loading="lazy" style={frame} />
+        </div>
       </div>
 
-      <div className="fade-up stagger-4" style={{ display: 'flex', gap: '12px' }}>
+      {/* Recommendations */}
+      <div className="fade-up" style={{ marginBottom: '72px' }}>
+        <h2 style={heading}>Recommendations</h2>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          {[
+            { quote: 'I had the pleasure of supervising Samantha during her co-op term, and she made an outstanding contribution to our team. She quickly adapted to our fast-paced environment at Revvity, demonstrating a keen ability to learn new concepts and apply them effectively, especially in the complex healthcare UX space. Samantha impressed me with her strong work ethic, attention to detail, and proactive approach to problem-solving. She consistently delivered high-quality work, met challenging deadlines, and was always eager to help colleagues. Her curiosity and commitment to understanding both UX principles and the healthcare sector resulted in solutions that were both practical and innovative.', name: 'Sharath Sundar', title: 'Manager, UX & AI Ops @ Revvity · managed me directly' },
+            { quote: "Samantha is an exceptionally talented UX designer. Throughout my time working with her, I've seen her bring countless digital interface projects to life. I am consistently impressed by her ability to transform design requirements into tangible, user-friendly screens with remarkable fluidity. She is also deeply thoughtful about the user experience. As her UX researcher, I appreciated how readily she sought insights on UX principles and best practices to refine her work. Her proactive approach highlights both her dedication to excellence and her strong commitment to cross-functional collaboration.", name: 'Dareen Christabel', title: 'UX Researcher @ Revvity · same team' },
+          ].map(({ quote, name, title }) => (
+            <div key={name} style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '28px 30px' }}>
+              <p style={{ fontFamily: 'var(--serif)', fontSize: '16px', color: 'var(--ink)', lineHeight: '1.7', margin: '0 0 16px' }}>&ldquo;{quote}&rdquo;</p>
+              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>{name}</div>
+              <div style={{ fontSize: '13px', color: 'var(--ink-muted)', marginTop: '2px' }}>{title}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* When I'm not designing */}
+      <div className="fade-up" style={{ marginBottom: '56px' }}>
+        <h2 style={heading}>When I'm not designing</h2>
+        <p style={{ ...para, maxWidth: '740px' }}>You'll probably find me with paint on my hands, flying down a snowy hill, or running around Toronto training for my next marathon. I love finding new ways to challenge myself, whether it's experimenting with watercolor techniques, snowboarding new terrain, or hitting a new personal record on race day. 🤗</p>
+        <div className="cs-2col">
+          <img src={`${IMG}/hobby-1.jpg`} alt="" loading="lazy" style={frame} />
+          <img src={`${IMG}/hobby-2.jpg`} alt="" loading="lazy" style={frame} />
+        </div>
+      </div>
+
+      {/* Contact */}
+      <div className="fade-up" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
         <a href="mailto:samanthaho1021@gmail.com" style={{
           display: 'inline-flex', alignItems: 'center', gap: '8px',
           background: 'var(--accent)', color: 'white', padding: '12px 24px',
