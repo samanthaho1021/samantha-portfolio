@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route, Link, useLocation } from 'react-router-do
 import TaxManagementCaseStudy from './TaxManagementCaseStudy';
 import NarrativeCaseStudy from './NarrativeCaseStudy';
 import revvityData from './caseStudies/revvity';
+import cryptoData from './caseStudies/crypto';
+import greenpeaceData from './caseStudies/greenpeace';
+import aChanceData from './caseStudies/aChanceInLife';
 import { CaseStudyNav } from './caseStudyNav';
 
 // ── GLOBAL STYLES ──────────────────────────────────────────
@@ -226,8 +229,8 @@ const projects = [
     color: '#7C2D12',
     bgColor: '#FEF3EC',
     image: '/thumbs/crypto.jpg',
-    link: 'https://samanthaho-productdesigner.framer.website/crypto-arsenal',
-    live: false,
+    link: '/case-study/crypto-arsenal',
+    live: true,
   },
   {
     id: 'greenpeace',
@@ -239,8 +242,8 @@ const projects = [
     color: '#064E3B',
     bgColor: '#ECFDF5',
     image: '/thumbs/greenpeace.jpg',
-    link: 'https://samanthaho-productdesigner.framer.website/greenpeace',
-    live: false,
+    link: '/case-study/greenpeace',
+    live: true,
   },
   {
     id: 'a-chance-in-life',
@@ -252,8 +255,8 @@ const projects = [
     color: '#1D4ED8',
     bgColor: '#E8F0FE',
     image: '/thumbs/a-chance-in-life.jpg',
-    link: 'https://samanthaho-productdesigner.framer.website/a-chance-in-life',
-    live: false,
+    link: '/case-study/a-chance-in-life',
+    live: true,
   },
 ];
 
@@ -1713,6 +1716,9 @@ export default function App() {
           <Route path="/case-study/suger-prm" element={<SugerCaseStudy />} />
           <Route path="/case-study/tax-management" element={<TaxManagementCaseStudy />} />
           <Route path="/case-study/revvity" element={<NarrativeCaseStudy data={revvityData} />} />
+          <Route path="/case-study/crypto-arsenal" element={<NarrativeCaseStudy data={cryptoData} />} />
+          <Route path="/case-study/greenpeace" element={<NarrativeCaseStudy data={greenpeaceData} />} />
+          <Route path="/case-study/a-chance-in-life" element={<NarrativeCaseStudy data={aChanceData} />} />
         </Routes>
       </BrowserRouter>
     </>
