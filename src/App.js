@@ -119,9 +119,35 @@ const globalStyles = `
   @keyframes spin360 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
   .flower { display: inline-block; vertical-align: baseline; animation: spin360 5s linear infinite; }
 
+  /* Hero top-right dark-brown triangle that Tetris-drops in */
+  .tetris-tri {
+    position: absolute; right: 14%; bottom: -160px;
+    width: 168px; height: 520px;
+    background: #3E2A1F;
+    clip-path: polygon(50% 0, 100% 100%, 0 96%);
+    transform-origin: 50% 100%;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .tetris-tri.drop {
+    opacity: 1;
+    animation: tetrisDrop 1.5s cubic-bezier(.2, .7, .3, 1) 0.9s both;
+  }
+  @keyframes tetrisDrop {
+    0%   { transform: translateY(-150vh) rotate(0deg); }
+    46%  { transform: translateY(0) rotate(0deg); }
+    58%  { transform: translateY(0) rotate(4deg); }
+    70%  { transform: translateY(0) rotate(-3deg); }
+    82%  { transform: translateY(0) rotate(2deg); }
+    92%  { transform: translateY(0) rotate(-0.8deg); }
+    100% { transform: translateY(0) rotate(0deg); }
+  }
+  @media (max-width: 720px) { .tetris-tri { display: none; } }
+
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
     .flower { animation: none; }
+    .tetris-tri.drop { animation: none; opacity: 1; }
   }
 
   /* Case study: two-up comparison (before/after, image+prompts) */
@@ -435,10 +461,15 @@ function Flower() {
 }
 
 function HomePage() {
+  // Observe the (stationary) hero so the triangle's own drop animation, which
+  // moves it off-screen, doesn't toggle its own trigger.
+  const [heroRef, heroSeen] = useInView(0.2, true);
   return (
     <>
       {/* Hero (beige) */}
-      <section className="home-inner" style={{ paddingTop: '140px', paddingBottom: '64px', position: 'relative', zIndex: 1 }}>
+      <section ref={heroRef} style={{ paddingTop: '140px', paddingBottom: '64px', position: 'relative', zIndex: 1 }}>
+        <div className={`tetris-tri ${heroSeen ? 'drop' : ''}`} aria-hidden="true" />
+        <div className="home-inner">
       <div style={{ marginBottom: '0' }}>
         <div className="fade-up stagger-1" style={{
           display: 'inline-block',
@@ -494,6 +525,7 @@ function HomePage() {
           ))}
         </div>
       </div>
+        </div>
 
       </section>
 
