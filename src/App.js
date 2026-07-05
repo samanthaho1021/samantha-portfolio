@@ -121,11 +121,11 @@ const globalStyles = `
 
   /* Hero top-right dark-brown triangle that Tetris-drops in */
   .tetris-tri {
-    position: absolute; right: 14%; bottom: -160px;
-    width: 168px; height: 520px;
+    position: absolute; right: 0; bottom: -205px;
+    width: 150px; height: 500px;
     background: #3E2A1F;
-    clip-path: polygon(50% 0, 100% 100%, 0 96%);
-    transform-origin: 50% 100%;
+    clip-path: polygon(100% 0, 100% 100%, 0 96%);
+    transform-origin: 100% 100%;
     opacity: 0;
     pointer-events: none;
   }
