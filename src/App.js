@@ -395,8 +395,8 @@ function HomePage() {
           color: 'var(--ink)',
         }}>
           Hi, I'm Samantha Ho, a design-led<br />
-          <span style={{ color: 'var(--accent)' }}>product manager</span> crafting<br />
-          intelligent B2B SaaS experiences.
+          <span style={{ color: 'var(--accent)' }}>product manager</span> taking complex<br />
+          B2B SaaS from problem to launch.
         </h1>
 
         <p className="fade-up stagger-3" style={{
