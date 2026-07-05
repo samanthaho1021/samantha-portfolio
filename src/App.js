@@ -112,6 +112,10 @@ const globalStyles = `
     .about-bio { grid-template-columns: 1fr; }
   }
 
+  /* About: hobby photo row */
+  .about-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 720px) { .about-photos { grid-template-columns: 1fr; } }
+
   /* About page: match the case-study content band (100px pad + 190 nav + 48 gap = 338) */
   .about-body { padding: 140px 338px 80px; }
   @media (max-width: 1100px) { .about-body { padding: 120px 100px 80px; } }
@@ -513,9 +517,10 @@ function AboutPage() {
       <div className="fade-up" style={{ marginBottom: '56px' }}>
         <h2 style={heading}>When I'm not designing</h2>
         <p style={{ ...para, maxWidth: '740px' }}>You'll probably find me with paint on my hands, flying down a snowy hill, or running around Toronto training for my next marathon. I love finding new ways to challenge myself, whether it's experimenting with watercolor techniques, snowboarding new terrain, or hitting a new personal record on race day. 🤗</p>
-        <div className="cs-2col">
-          <img src={`${IMG}/hobby-1.jpg`} alt="" loading="lazy" style={frame} />
-          <img src={`${IMG}/hobby-2.jpg`} alt="" loading="lazy" style={frame} />
+        <div className="about-photos">
+          {['hobby-1', 'hobby-2', 'hobby-3'].map(n => (
+            <img key={n} src={`${IMG}/${n}.jpg`} alt="" loading="lazy" style={{ ...frame, aspectRatio: '3 / 4', objectFit: 'cover' }} />
+          ))}
         </div>
       </div>
 
