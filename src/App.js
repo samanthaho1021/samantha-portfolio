@@ -95,7 +95,7 @@ const globalStyles = `
   }
 
   /* Home page: work cards grid */
-  .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
   @media (max-width: 720px) {
     .work-grid { grid-template-columns: 1fr; }
   }
