@@ -111,6 +111,11 @@ const globalStyles = `
   @media (max-width: 720px) {
     .about-bio { grid-template-columns: 1fr; }
   }
+
+  /* About page: match the case-study content band (100px pad + 190 nav + 48 gap = 338) */
+  .about-body { padding: 140px 338px 80px; }
+  @media (max-width: 1100px) { .about-body { padding: 120px 100px 80px; } }
+  @media (max-width: 900px) { .about-body { padding: 100px 24px 80px; } }
 `;
 
 // ── NAV ────────────────────────────────────────────────────
@@ -456,7 +461,7 @@ function AboutPage() {
   const frame = { width: '100%', display: 'block', borderRadius: '12px', border: '1px solid var(--border)', boxShadow: '0 8px 30px rgba(62,42,31,0.08)' };
 
   return (
-    <div style={{ paddingTop: '140px', maxWidth: '860px', margin: '0 auto', padding: '140px 40px 80px' }}>
+    <div className="about-body">
       <div className="fade-up stagger-1" style={{ marginBottom: '48px' }}>
         <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'var(--ink-muted)', textTransform: 'uppercase', marginBottom: '20px' }}>About</div>
         <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(36px, 5vw, 52px)', lineHeight: '1.15', margin: 0 }}>
