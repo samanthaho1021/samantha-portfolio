@@ -394,9 +394,9 @@ function HomePage() {
           marginBottom: '24px',
           color: 'var(--ink)',
         }}>
-          Hi, I'm Samantha —<br />
-          <span style={{ color: 'var(--accent)' }}>product designer</span> crafting<br />
-          intelligent B2B experiences.
+          Hi, I'm Samantha Ho, a design-led<br />
+          <span style={{ color: 'var(--accent)' }}>product manager</span> crafting<br />
+          intelligent B2B SaaS experiences.
         </h1>
 
         <p className="fade-up stagger-3" style={{
