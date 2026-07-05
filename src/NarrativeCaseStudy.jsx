@@ -39,11 +39,12 @@ function Body({ children }) {
   );
 }
 
-function SubHead({ children }) {
+function SubHead({ children, minH }) {
   return (
     <h3 style={{
       fontFamily: 'var(--serif)', fontSize: '20px', lineHeight: '1.3',
       margin: '32px 0 12px', color: 'var(--ink)',
+      ...(minH ? { minHeight: `${minH}px` } : {}),
     }}>{children}</h3>
   );
 }
@@ -117,18 +118,25 @@ function Figure({ src, video, caption, max = '760px', tight = false, height }) {
 
 function Block({ block, IMG, tight }) {
   if (block.p) return <Body>{block.p}</Body>;
-  if (block.sub) return <SubHead>{block.sub}</SubHead>;
+  if (block.sub) return <SubHead minH={block.minH}>{block.sub}</SubHead>;
   if (block.quote) return <Quote label={block.quote.label}>{block.quote.text}</Quote>;
   if (block.callout) return <Callout label={block.callout.label}>{block.callout.text}</Callout>;
   if (block.list) return <List items={block.list} />;
   if (block.metrics) return <Metrics items={block.metrics} />;
-  if (block.columns) return (
-    <div className="cs-2col">
-      {block.columns.map((col, ci) => (
-        <div key={ci}>{col.map((b, bi) => <Block key={bi} block={b} IMG={IMG} tight />)}</div>
-      ))}
-    </div>
-  );
+  if (block.columns) {
+    // Render row-major so each grid row's height is the max of its pair; the
+    // images/videos below stay aligned even when a title wraps to more lines.
+    const cols = block.columns;
+    const rows = Math.max(...cols.map(c => c.length));
+    const items = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols.length; c++) {
+        const b = cols[c][r];
+        items.push(<div key={`${r}-${c}`}>{b ? <Block block={b} IMG={IMG} tight /> : null}</div>);
+      }
+    }
+    return <div className="cs-2col">{items}</div>;
+  }
   if (block.img) return <Figure src={`${IMG}/${block.img}`} caption={block.cap} max={block.max} tight={tight} height={block.h} />;
   if (block.video) return <Figure video={`${IMG}/${block.video}`} caption={block.cap} max={block.max} tight={tight} height={block.h} />;
   return null;
