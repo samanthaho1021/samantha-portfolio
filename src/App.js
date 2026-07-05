@@ -116,9 +116,8 @@ const globalStyles = `
   .about-photos { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
   @media (max-width: 720px) { .about-photos { grid-template-columns: 1fr; } }
 
-  /* Home + About: align content with the case-study TEXT column
-     (100px page pad + 190 nav + 48 gap = 338), not the nav edge */
-  .page-body { padding: 140px 338px 80px; }
+  /* Home + About: 280px side margin (narrower than the case-study text column) */
+  .page-body { padding: 140px 280px 80px; }
   @media (max-width: 1100px) { .page-body { padding: 120px 100px 80px; } }
   @media (max-width: 900px) { .page-body { padding: 110px 24px 80px; } }
 `;
