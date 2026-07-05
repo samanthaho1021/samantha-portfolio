@@ -97,14 +97,17 @@ function Metrics({ items }) {
 
 // A framed image or looping video. No fixed aspect ratio, so wide diagrams and
 // tall panels both display in full.
-function Figure({ src, video, caption, max = '760px', tight = false }) {
+function Figure({ src, video, caption, max = '760px', tight = false, height }) {
+  const mStyle = height
+    ? { display: 'block', width: '100%', height: `${height}px`, objectFit: 'contain', background: '#ffffff' }
+    : { display: 'block', width: '100%' };
   return (
     <figure style={{ margin: tight ? '0 0 12px' : '32px auto', maxWidth: tight ? '100%' : max }}>
       <div style={{ border: '1px solid var(--border)', borderRadius: '12px', overflow: 'hidden', boxShadow: '0 12px 40px rgba(62,42,31,0.10)', background: 'var(--white)' }}>
         {video ? (
-          <video src={video} autoPlay loop muted playsInline preload="metadata" style={{ display: 'block', width: '100%' }} />
+          <video src={video} autoPlay loop muted playsInline preload="metadata" style={mStyle} />
         ) : (
-          <img src={src} alt={caption || ''} loading="lazy" style={{ display: 'block', width: '100%' }} />
+          <img src={src} alt={caption || ''} loading="lazy" style={mStyle} />
         )}
       </div>
       {caption && <figcaption style={{ fontSize: '12px', color: 'var(--ink-muted)', textAlign: 'center', marginTop: '10px' }}>{caption}</figcaption>}
@@ -126,8 +129,8 @@ function Block({ block, IMG, tight }) {
       ))}
     </div>
   );
-  if (block.img) return <Figure src={`${IMG}/${block.img}`} caption={block.cap} max={block.max} tight={tight} />;
-  if (block.video) return <Figure video={`${IMG}/${block.video}`} caption={block.cap} max={block.max} tight={tight} />;
+  if (block.img) return <Figure src={`${IMG}/${block.img}`} caption={block.cap} max={block.max} tight={tight} height={block.h} />;
+  if (block.video) return <Figure video={`${IMG}/${block.video}`} caption={block.cap} max={block.max} tight={tight} height={block.h} />;
   return null;
 }
 

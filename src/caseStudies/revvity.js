@@ -113,12 +113,12 @@ const revvity = {
         { columns: [
           [
             { sub: 'Before Usability Tests' },
-            { img: 'test-before.jpg' },
+            { img: 'test-before.jpg', h: 420 },
             { video: 'test-before-demo.mp4', cap: 'Before: parameter details lived on a separate page.' },
           ],
           [
             { sub: 'After Usability Tests (Extended section + Edit and Delete buttons)' },
-            { img: 'test-after.jpg' },
+            { img: 'test-after.jpg', h: 420 },
             { video: 'test-after-demo.mp4', cap: 'After: technicians edit or delete a method directly from the panel.' },
           ],
         ] },
