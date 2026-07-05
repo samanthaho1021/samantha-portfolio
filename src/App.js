@@ -106,11 +106,11 @@ const globalStyles = `
   @media (max-width: 900px) { .home-inner { padding: 0 24px; } }
 
   .green-band { background: var(--accent); }
-  .band-work { clip-path: polygon(0 60px, 100% 0, 100% calc(100% - 60px), 0 100%); }
-  .band-footer { clip-path: polygon(0 0, 100% 60px, 100% 100%, 0 100%); }
+  .band-work { clip-path: polygon(0 170px, 100% 0, 100% calc(100% - 90px), 0 100%); }
+  .band-footer { clip-path: polygon(0 0, 100% 100px, 100% 100%, 0 100%); }
   @media (max-width: 720px) {
-    .band-work { clip-path: polygon(0 28px, 100% 0, 100% calc(100% - 28px), 0 100%); }
-    .band-footer { clip-path: polygon(0 0, 100% 28px, 100% 100%, 0 100%); }
+    .band-work { clip-path: polygon(0 70px, 100% 0, 100% calc(100% - 40px), 0 100%); }
+    .band-footer { clip-path: polygon(0 0, 100% 44px, 100% 100%, 0 100%); }
   }
 
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
@@ -439,7 +439,7 @@ function HomePage() {
   return (
     <>
       {/* Hero (beige) */}
-      <section className="home-inner" style={{ paddingTop: '140px', paddingBottom: '96px' }}>
+      <section className="home-inner" style={{ paddingTop: '140px', paddingBottom: '40px', position: 'relative', zIndex: 1 }}>
       <div style={{ marginBottom: '0' }}>
         <div className="fade-up stagger-1" style={{
           display: 'inline-block',
@@ -498,8 +498,9 @@ function HomePage() {
 
       </section>
 
-      {/* Selected Work — diagonal green band (slopes up to the right) */}
-      <section className="green-band band-work" style={{ paddingTop: '128px', paddingBottom: '128px', marginTop: '-40px' }}>
+      {/* Selected Work — diagonal green band rising into the hero (slopes up-right),
+          ending diagonally around the middle cards */}
+      <section className="green-band band-work" style={{ paddingTop: '200px', paddingBottom: '72px', marginTop: '-120px' }}>
         <div className="home-inner">
           <Reveal>
             <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'rgba(250,248,245,0.72)', textTransform: 'uppercase', marginBottom: '32px' }}>
@@ -507,12 +508,23 @@ function HomePage() {
             </div>
           </Reveal>
           <div className="work-grid">
-            {projects.map((project, i) => (
+            {projects.slice(0, 4).map((project, i) => (
               <Reveal key={project.id} delay={i * 80}>
                 <ProjectCard project={project} />
               </Reveal>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Remaining work on beige */}
+      <section className="home-inner" style={{ paddingTop: '56px', paddingBottom: '96px' }}>
+        <div className="work-grid">
+          {projects.slice(4).map((project, i) => (
+            <Reveal key={project.id} delay={i * 80}>
+              <ProjectCard project={project} />
+            </Reveal>
+          ))}
         </div>
       </section>
 
