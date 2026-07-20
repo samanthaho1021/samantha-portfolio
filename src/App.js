@@ -106,7 +106,14 @@ const globalStyles = `
   @media (max-width: 900px) { .home-inner { padding: 0 24px; } }
 
   .green-band { background: var(--accent); }
-  .band-work { clip-path: polygon(0 0, 100% 200px, 100% 100%, 0 calc(100% - 120px)); }
+  .band-work {
+    clip-path: polygon(0 0, 100% 200px, 100% 100%, 0 calc(100% - 120px));
+    animation: greenSlideIn 0.9s cubic-bezier(.2, .7, .3, 1) 0.3s both;
+  }
+  @keyframes greenSlideIn {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(0); }
+  }
   .band-footer { clip-path: polygon(0 110px, 100% 0, 100% 100%, 0 100%); }
   @media (max-width: 720px) {
     .band-work { clip-path: polygon(0 0, 100% 80px, 100% 100%, 0 calc(100% - 48px)); }
@@ -121,10 +128,10 @@ const globalStyles = `
 
   /* Hero top-right dark-brown triangle that Tetris-drops in */
   .tetris-tri {
-    position: absolute; right: 0; bottom: -205px;
-    width: 150px; height: 500px;
+    position: absolute; right: 0; bottom: -196px;
+    width: 260px; height: 640px;
     background: #3E2A1F;
-    clip-path: polygon(100% 0, 100% 100%, 0 96%);
+    clip-path: polygon(100% 0, 100% 100%, 0 95%);
     transform-origin: 100% 100%;
     opacity: 0;
     pointer-events: none;
@@ -147,6 +154,7 @@ const globalStyles = `
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
     .flower { animation: none; }
+    .band-work { animation: none; transform: none; }
     .tetris-tri.drop { animation: none; opacity: 1; }
   }
 
@@ -529,10 +537,9 @@ function HomePage() {
 
       </section>
 
-      {/* Selected Work — diagonal green band (slopes down to the right), slides in on
-          scroll, ending diagonally around the middle cards */}
-      <Reveal repeat style={{ marginTop: '-8px' }}>
-      <section className="green-band band-work" style={{ paddingTop: '156px', paddingBottom: '96px' }}>
+      {/* Selected Work — diagonal green band (slopes down to the right); slides in
+          from off-screen left on page load, ending diagonally around the middle cards */}
+      <section className="green-band band-work" style={{ marginTop: '-8px', paddingTop: '156px', paddingBottom: '96px' }}>
         <div className="home-inner">
           <Reveal>
             <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'rgba(250,248,245,0.72)', textTransform: 'uppercase', marginBottom: '32px' }}>
@@ -548,7 +555,6 @@ function HomePage() {
           </div>
         </div>
       </section>
-      </Reveal>
 
       {/* Remaining work on beige */}
       <section className="home-inner" style={{ paddingTop: '56px', paddingBottom: '96px' }}>
