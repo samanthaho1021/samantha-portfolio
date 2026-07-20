@@ -10,49 +10,84 @@ import { CaseStudyNav } from './caseStudyNav';
 
 // ── GLOBAL STYLES ──────────────────────────────────────────
 const globalStyles = `
-  @font-face {
-    font-family: 'Carlito';
-    font-style: normal;
-    font-weight: 400;
-    font-display: swap;
-    src: url('/fonts/carlito-400.woff2') format('woff2');
-  }
-  @font-face {
-    font-family: 'Carlito';
-    font-style: normal;
-    font-weight: 700;
-    font-display: swap;
-    src: url('/fonts/carlito-700.woff2') format('woff2');
-  }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
     --bg: #FAF8F5;
     --cs-bg: #FDFDFC;
     --ink: #3E2A1F;
+    --ink-deep: #2A1A10;
     --ink-soft: #6B4E3D;
     --ink-muted: #A08B7A;
     --accent: #1A4D2E;
     --accent-light: #E4EDE5;
+    --accent-deep: #123A22;
     --border: #E8E3DC;
+    --line: #D8CFC2;
     --white: #FFFFFF;
-    --serif: 'Carlito', 'Calibri', 'Segoe UI', sans-serif;
-    --sans: 'Carlito', 'Calibri', 'Segoe UI', sans-serif;
+    --font-display: 'Archivo', system-ui, -apple-system, sans-serif;
+    --font-head: 'VT323', 'JetBrains Mono', ui-monospace, monospace;
+    --font-sans: 'Archivo', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    /* legacy aliases kept so case-study pages inherit the new system */
+    --serif: var(--font-display);
+    --sans: var(--font-sans);
+    --radius: 4px;
   }
 
   html { scroll-behavior: smooth; }
-  
+
   body {
     background: var(--bg);
     color: var(--ink);
-    font-family: var(--sans);
+    font-family: var(--font-sans);
     font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   a { color: inherit; text-decoration: none; }
+
+  /* ── shared utilities (techy furniture-catalog system) ── */
+  .mono { font-family: var(--font-mono); font-feature-settings: "tnum" 1, "zero" 1; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+  .rule { height: 1px; background: var(--line); width: 100%; border: 0; display: block; }
+
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+
+  /* nav underline sweep */
+  .nav-link { position: relative; }
+  .nav-link::after {
+    content: ''; position: absolute; left: 0; right: 100%; bottom: -5px;
+    height: 1px; background: currentColor; transition: right .32s cubic-bezier(.4,.7,.2,1);
+  }
+  .nav-link:hover::after, .nav-link.active::after { right: 0; }
+
+  /* availability dot */
+  @keyframes dotPulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+  .dot { animation: dotPulse 2.2s ease-in-out infinite; }
+
+  /* catalog piece hover */
+  .cat-media { overflow: hidden; background: var(--accent-light); }
+  .cat-media img { display: block; width: 100%; height: 100%; object-fit: cover;
+    transition: transform .7s cubic-bezier(.2,.7,.2,1); }
+  .cat:hover .cat-media img { transform: scale(1.045); }
+  .cat-title { transition: color .3s ease; }
+  .cat:hover .cat-title { color: var(--accent); }
+  .cat-view { opacity: 0; transform: translateX(-6px); transition: opacity .3s ease, transform .3s ease; }
+  .cat:hover .cat-view { opacity: 1; transform: none; }
 
   ::selection {
     background: var(--accent);
@@ -94,68 +129,42 @@ const globalStyles = `
     .cs-body { padding: 60px 24px; }
   }
 
-  /* Home page: work cards grid */
-  .work-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; }
-  @media (max-width: 720px) {
-    .work-grid { grid-template-columns: 1fr; }
+  /* Home page: catalog grid (hairline-separated pieces) */
+  .work-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 64px; row-gap: 76px; }
+  @media (max-width: 760px) {
+    .work-grid { grid-template-columns: 1fr; row-gap: 56px; }
   }
 
-  /* Home page: diagonal green bands + scroll reveal + flower */
-  .home-inner { padding: 0 280px; }
-  @media (max-width: 1100px) { .home-inner { padding: 0 100px; } }
+  /* Home: catalog is a touch wider than the reading column for imagery presence */
+  .home-inner { padding: 0 200px; }
+  @media (max-width: 1200px) { .home-inner { padding: 0 100px; } }
   @media (max-width: 900px) { .home-inner { padding: 0 24px; } }
 
-  .green-band { background: var(--accent); }
-  .band-work {
-    clip-path: polygon(0 0, 100% 200px, 100% 100%, 0 calc(100% - 120px));
-    animation: greenSlideIn 0.9s cubic-bezier(.2, .7, .3, 1) 0.3s both;
-  }
-  @keyframes greenSlideIn {
-    from { transform: translateX(-100%); }
-    to   { transform: translateX(0); }
-  }
-  .band-footer { clip-path: polygon(0 110px, 100% 0, 100% 100%, 0 100%); }
-  @media (max-width: 720px) {
-    .band-work { clip-path: polygon(0 0, 100% 80px, 100% 100%, 0 calc(100% - 48px)); }
-    .band-footer { clip-path: polygon(0 48px, 100% 0, 100% 100%, 0 100%); }
+  /* Flat full-bleed olive block (statement band + footer) */
+  .olive-band { background: var(--accent); color: var(--bg); }
+
+  /* Hero duotone flower layer uses fixed-px clip coords tuned for desktop;
+     hide it on narrow screens so it can't cover the whole viewport. */
+  @media (max-width: 820px) { .hero-clip-layer { display: none !important; } }
+
+  /* Footer flower layer: on narrow screens drop the clip so the olive layer
+     fills the footer (solid olive band with cream text, the original look). */
+  @media (max-width: 820px) {
+    .footer-clip-layer { clip-path: none !important; -webkit-clip-path: none !important; }
   }
 
   .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
   .reveal.in-view { opacity: 1; transform: none; }
 
   @keyframes spin360 { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-  .flower { display: inline-block; vertical-align: baseline; animation: spin360 5s linear infinite; }
-
-  /* Hero top-right dark-brown triangle that Tetris-drops in */
-  .tetris-tri {
-    position: absolute; right: 0; bottom: -196px;
-    width: 260px; height: 640px;
-    background: #3E2A1F;
-    clip-path: polygon(100% 0, 100% 100%, 0 95%);
-    transform-origin: 100% 100%;
-    opacity: 0;
-    pointer-events: none;
-  }
-  .tetris-tri.drop {
-    opacity: 1;
-    animation: tetrisDrop 1.5s cubic-bezier(.2, .7, .3, 1) 0.9s both;
-  }
-  @keyframes tetrisDrop {
-    0%   { transform: translateY(-150vh) rotate(0deg); }
-    46%  { transform: translateY(0) rotate(0deg); }
-    58%  { transform: translateY(0) rotate(4deg); }
-    70%  { transform: translateY(0) rotate(-3deg); }
-    82%  { transform: translateY(0) rotate(2deg); }
-    92%  { transform: translateY(0) rotate(-0.8deg); }
-    100% { transform: translateY(0) rotate(0deg); }
-  }
-  @media (max-width: 720px) { .tetris-tri { display: none; } }
+  .flower { display: inline-block; vertical-align: baseline; animation: spin360 9s linear infinite; }
 
   @media (prefers-reduced-motion: reduce) {
     .reveal { opacity: 1; transform: none; transition: none; }
     .flower { animation: none; }
-    .band-work { animation: none; transform: none; }
-    .tetris-tri.drop { animation: none; opacity: 1; }
+    .dot { animation: none; }
+    .cat:hover .cat-media img { transform: none; }
+    * { scroll-behavior: auto !important; }
   }
 
   /* Case study: two-up comparison (before/after, image+prompts) */
@@ -198,53 +207,61 @@ function Nav() {
     padding: '0 40px',
     height: '64px',
     display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-    background: scrolled ? 'rgba(250,248,245,0.92)' : 'transparent',
-    backdropFilter: scrolled ? 'blur(12px)' : 'none',
-    borderBottom: scrolled ? '1px solid var(--border)' : '1px solid transparent',
-    transition: 'all 0.3s ease',
+    background: scrolled ? 'rgba(250,248,245,0.85)' : 'transparent',
+    backdropFilter: scrolled ? 'saturate(140%) blur(14px)' : 'none',
+    borderBottom: scrolled ? '1px solid var(--line)' : '1px solid transparent',
+    transition: 'background 0.3s ease, border-color 0.3s ease, backdrop-filter 0.3s ease',
   };
 
   const logoStyle = {
-    fontFamily: 'var(--serif)',
-    fontSize: '18px',
+    display: 'flex', alignItems: 'baseline', gap: '10px',
+    fontFamily: 'var(--font-display)',
+    fontSize: '16px', fontWeight: '800',
+    letterSpacing: '-0.01em',
     color: 'var(--ink)',
   };
 
-  const linksStyle = {
-    display: 'flex', gap: '32px', alignItems: 'center',
-  };
+  const linksStyle = { display: 'flex', gap: '30px', alignItems: 'center' };
 
   const linkStyle = (active) => ({
-    fontFamily: 'var(--sans)',
-    fontSize: '14px',
-    fontWeight: '400',
+    fontFamily: 'var(--font-mono)',
+    fontSize: '12px',
+    fontWeight: '500',
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase',
     color: active ? 'var(--ink)' : 'var(--ink-soft)',
     transition: 'color 0.2s',
-    letterSpacing: '0.01em',
   });
 
   return (
     <nav style={navStyle}>
-      <Link to="/" style={logoStyle}>Samantha Ho</Link>
+      <Link to="/" style={logoStyle}>
+        Samantha Ho
+        <span className="mono" style={{ fontSize: '10px', fontWeight: '500', letterSpacing: '0.12em', color: 'var(--ink-muted)', textTransform: 'uppercase' }}>
+          ©2026
+        </span>
+      </Link>
       <div style={linksStyle}>
-        <Link to="/" style={linkStyle(location.pathname === '/')}>Work</Link>
-        <Link to="/about" style={linkStyle(location.pathname === '/about')}>About</Link>
-        <a href="https://www.linkedin.com/in/samantha-ho-uxdesigner/" target="_blank" rel="noreferrer" style={linkStyle(false)}>LinkedIn</a>
+        <Link to="/" className={`nav-link ${location.pathname === '/' ? 'active' : ''}`} style={linkStyle(location.pathname === '/')}>Work</Link>
+        <Link to="/about" className={`nav-link ${location.pathname === '/about' ? 'active' : ''}`} style={linkStyle(location.pathname === '/about')}>About</Link>
+        <a href="https://www.linkedin.com/in/samantha-ho-uxdesigner/" target="_blank" rel="noreferrer" className="nav-link" style={linkStyle(false)}>LinkedIn</a>
         <a
           href="/resume.pdf"
           target="_blank"
           rel="noreferrer"
           style={{
-            ...linkStyle(false),
+            fontFamily: 'var(--font-mono)',
+            fontSize: '12px',
+            fontWeight: '600',
+            letterSpacing: '0.06em',
+            textTransform: 'uppercase',
             background: 'var(--accent)',
-            color: 'white',
-            padding: '8px 18px',
-            borderRadius: '100px',
-            fontSize: '13px',
-            fontWeight: '500',
+            color: 'var(--bg)',
+            padding: '9px 16px',
+            borderRadius: '2px',
           }}
         >
-          Resume ↗
+          Résumé ↗
         </a>
       </div>
     </nav>
@@ -256,7 +273,7 @@ const projects = [
   {
     id: 'suger-prm',
     number: '01',
-    company: 'Suger · AI Product Designer · 2025–2026',
+    company: 'Suger · AI Product Manager · 2025–2026',
     title: 'Suger Partner Intelligence System',
     subtitle: 'Designing Contact List + PRM, from "who do I call?" to a full partner relationship layer for cloud marketplace sellers.',
     tags: ['B2B SaaS', 'AI Features', 'Systems Design', 'PRM'],
@@ -269,7 +286,7 @@ const projects = [
   {
     id: 'tax-management',
     number: '02',
-    company: 'Suger · AI Product Designer · 2026',
+    company: 'Suger · AI Product Manager · 2026',
     title: 'Tax Management: Revenue-to-Tax Reconciliation',
     subtitle: 'A 0→1 feature that audits whether every dollar of marketplace revenue is represented in the tax books, then explains the gaps and fixes the missing records with one click.',
     tags: ['B2B SaaS', 'AI Features', 'Fintech / Tax', '0→1'],
@@ -334,86 +351,67 @@ const projects = [
 ];
 
 function ProjectCard({ project }) {
-  const [hovered, setHovered] = useState(false);
-
-  const tagStyle = (color, bg) => ({
+  const tagStyle = {
     display: 'inline-flex',
     alignItems: 'center',
-    padding: '3px 10px',
-    borderRadius: '100px',
-    fontSize: '11px',
+    padding: '4px 9px',
+    borderRadius: '2px',
+    border: '1px solid var(--line)',
+    fontFamily: 'var(--font-mono)',
+    fontSize: '10px',
     fontWeight: '500',
-    color: color,
-    background: bg,
-    letterSpacing: '0.02em',
-  });
+    letterSpacing: '0.06em',
+    textTransform: 'uppercase',
+    color: 'var(--ink-soft)',
+    background: 'transparent',
+  };
 
   const content = (
-    <div
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        background: 'var(--white)',
-        border: '1px solid var(--border)',
-        borderRadius: '16px',
-        overflow: 'hidden',
-        boxShadow: hovered ? '0 18px 40px rgba(62,42,31,0.14)' : '0 2px 12px rgba(62,42,31,0.05)',
-        transform: hovered ? 'translateY(-4px)' : 'translateY(0)',
-        transition: 'transform 0.3s ease, box-shadow 0.3s ease',
-      }}
-    >
-      {/* Thumbnail */}
-      <div style={{ position: 'relative', background: project.bgColor, aspectRatio: '16 / 10', overflow: 'hidden' }}>
-        <img
-          src={project.image}
-          alt={project.title}
-          loading="lazy"
-          style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            display: 'block',
-            transform: hovered ? 'scale(1.03)' : 'scale(1)',
-            transition: 'transform 0.4s ease',
-          }}
-        />
-        <span style={{
-          position: 'absolute', top: '14px', left: '14px',
-          fontFamily: 'var(--serif)', fontSize: '13px', fontWeight: '600',
-          color: 'var(--ink)', background: 'rgba(255,255,255,0.88)',
-          padding: '3px 10px', borderRadius: '100px',
-        }}>{project.number}</span>
+    <div className="cat" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+      {/* Catalog spec row */}
+      <hr className="rule" />
+      <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: '16px', padding: '14px 0 18px' }}>
+        <span className="mono" style={{ fontSize: '13px', fontWeight: '700', color: 'var(--accent)', letterSpacing: '0.04em' }}>
+          {project.number}
+        </span>
+        <span className="mono" style={{ fontSize: '11px', color: 'var(--ink-muted)', letterSpacing: '0.04em', textAlign: 'right' }}>
+          {project.company}
+        </span>
       </div>
 
-      {/* Body */}
-      <div style={{ padding: '22px 24px 24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <div style={{ fontSize: '12px', color: 'var(--ink-muted)', marginBottom: '8px', fontWeight: '400', letterSpacing: '0.02em' }}>
-          {project.company}
-        </div>
-        <div style={{
-          fontFamily: 'var(--serif)',
-          fontSize: '22px',
-          lineHeight: '1.25',
-          marginBottom: '10px',
-          color: hovered ? project.color : 'var(--ink)',
-          transition: 'color 0.3s ease',
+      {/* Editorial imagery */}
+      <div className="cat-media" style={{ aspectRatio: '16 / 10', borderRadius: '2px', marginBottom: '20px' }}>
+        <img src={project.image} alt={project.title} loading="lazy" />
+      </div>
+
+      {/* Title + subtitle */}
+      <h3 className="cat-title" style={{
+        fontFamily: 'var(--font-head)',
+        fontSize: 'clamp(25px, 2.4vw, 31px)',
+        fontWeight: '400',
+        lineHeight: '1.02',
+        letterSpacing: '0',
+        marginBottom: '10px',
+        color: 'var(--ink-deep)',
+      }}>
+        {project.title}
+      </h3>
+      <p style={{ fontSize: '15px', color: 'var(--ink-soft)', lineHeight: '1.6', marginBottom: '18px' }}>
+        {project.subtitle}
+      </p>
+
+      {/* Tags + view affordance */}
+      <div style={{ display: 'flex', gap: '7px', flexWrap: 'wrap', alignItems: 'center', marginTop: 'auto' }}>
+        {project.tags.map(tag => (
+          <span key={tag} style={tagStyle}>{tag}</span>
+        ))}
+        <span className="cat-view mono" style={{
+          marginLeft: 'auto', fontSize: '11px', fontWeight: '600',
+          letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--accent)',
+          whiteSpace: 'nowrap',
         }}>
-          {project.title}
-        </div>
-        <div style={{ fontSize: '14px', color: 'var(--ink-soft)', lineHeight: '1.6', marginBottom: '16px' }}>
-          {project.subtitle}
-        </div>
-        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: 'auto' }}>
-          {project.tags.map(tag => (
-            <span key={tag} style={tagStyle(project.color, project.bgColor)}>{tag}</span>
-          ))}
-          {!project.live && (
-            <span style={tagStyle('#888', '#F0F0F0')}>Framer ↗</span>
-          )}
-        </div>
+          {project.live ? 'View ↗' : 'Framer ↗'}
+        </span>
       </div>
     </div>
   );
@@ -469,122 +467,171 @@ function Flower() {
 }
 
 function HomePage() {
-  // Observe the (stationary) hero so the triangle's own drop animation, which
-  // moves it off-screen, doesn't toggle its own trigger.
-  const [heroRef, heroSeen] = useInView(0.2, true);
-  return (
-    <>
-      {/* Hero (beige) */}
-      <section ref={heroRef} style={{ paddingTop: '140px', paddingBottom: '64px', position: 'relative', zIndex: 1 }}>
-        <div className={`tetris-tri ${heroSeen ? 'drop' : ''}`} aria-hidden="true" />
-        <div className="home-inner">
-      <div style={{ marginBottom: '0' }}>
-        <div className="fade-up stagger-1" style={{
-          display: 'inline-block',
-          fontSize: '12px',
-          fontWeight: '500',
-          letterSpacing: '0.08em',
-          color: 'var(--accent)',
-          background: 'var(--accent-light)',
-          padding: '4px 12px',
-          borderRadius: '100px',
-          marginBottom: '24px',
-          textTransform: 'uppercase',
-        }}>
-          Available for new roles
+  // One hero content block, rendered twice: dark-on-cream (base) and, when
+  // onFlower, cream-on-olive (clipped to the flower for the duotone effect).
+  const headStyle = {
+    fontFamily: 'var(--font-head)',
+    fontSize: 'clamp(52px, 8vw, 100px)',
+    fontWeight: '400',
+    lineHeight: '0.98',
+    letterSpacing: '0',
+    marginBottom: '28px',
+  };
+  const subStyle = { fontSize: '18px', lineHeight: '1.7', maxWidth: '600px' };
+  const heroText = (onFlower) => {
+    const cHead = onFlower ? 'var(--bg)' : 'var(--ink-deep)';
+    const cAccent = onFlower ? 'var(--bg)' : 'var(--accent)';
+    const cEye = onFlower ? 'var(--bg)' : 'var(--accent)';
+    const cSub = onFlower ? 'rgba(250,248,245,0.85)' : 'var(--ink-soft)';
+    const cLink = onFlower ? 'var(--bg)' : 'var(--accent)';
+    return (
+      <>
+        <div className="fade-up stagger-1" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '30px' }}>
+          <span className={onFlower ? '' : 'dot'} style={{ width: '8px', height: '8px', borderRadius: '50%', background: cEye, display: 'inline-block' }} />
+          <span className="eyebrow" style={{ color: cEye }}>Available for new roles</span>
         </div>
 
-        <h1 className="fade-up stagger-2" style={{
-          fontFamily: 'var(--serif)',
-          fontSize: 'clamp(42px, 6vw, 68px)',
-          lineHeight: '1.1',
-          marginBottom: '24px',
-          color: 'var(--ink)',
-        }}>
-          Hi, I'm Samantha Ho<Flower />, a design-led<br />
-          <span style={{ color: 'var(--accent)' }}>product manager</span> taking complex<br />
-          B2B SaaS from problem to launch.
+        <h1 className="fade-up stagger-2" style={{ ...headStyle, color: cHead }}>
+          Samantha Ho{onFlower
+            ? <span aria-hidden="true" style={{ display: 'inline-block', width: '0.82em', margin: '0 0.14em' }} />
+            : <Flower />} — a design-led<br />
+          <span style={{ color: cAccent }}>product manager</span> taking<br />
+          complex B2B&nbsp;SaaS<br />
+          from problem to launch.
         </h1>
 
-        <p className="fade-up stagger-3" style={{
-          fontSize: '18px',
-          color: 'var(--ink-soft)',
-          lineHeight: '1.7',
-          maxWidth: '560px',
-          fontWeight: '300',
-        }}>
+        <p className="fade-up stagger-3" style={{ ...subStyle, color: cSub }}>
           Currently designing AI-powered features at{' '}
-          <a href="https://suger.io" target="_blank" rel="noreferrer" style={{ color: 'var(--accent)', fontWeight: '500', borderBottom: '1px solid var(--accent-light)' }}>Suger</a>
-          {' '}— a cloud marketplace platform serving companies like AWS, Azure, and GCP partners.
-          4+ years in B2B SaaS, biotech, and NGO design.
+          <a href="https://suger.io" target="_blank" rel="noreferrer" style={{ color: cLink, fontWeight: '500', borderBottom: `1px solid ${cLink}` }}>Suger</a>
+          {' '}— a cloud marketplace platform serving AWS, Azure, and GCP partners.
+          Four-plus years across B2B SaaS, biotech, and NGO design.
         </p>
+      </>
+    );
+  };
 
-        <div className="fade-up stagger-4" style={{ display: 'flex', gap: '16px', marginTop: '32px', flexWrap: 'wrap' }}>
-          {['Figma', 'Claude Code', 'Lovable', 'Figma Make', 'SLDS v2', 'PrimeOne DS'].map(tool => (
-            <span key={tool} style={{
-              fontSize: '12px',
-              color: 'var(--ink-soft)',
-              background: 'var(--white)',
-              border: '1px solid var(--border)',
-              padding: '5px 12px',
-              borderRadius: '100px',
-              fontWeight: '400',
-            }}>{tool}</span>
-          ))}
-        </div>
-      </div>
-        </div>
-
-      </section>
-
-      {/* Selected Work — diagonal green band (slopes down to the right); slides in
-          from off-screen left on page load, ending diagonally around the middle cards */}
-      <section className="green-band band-work" style={{ marginTop: '-8px', paddingTop: '156px', paddingBottom: '96px' }}>
-        <div className="home-inner">
-          <Reveal>
-            <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'rgba(250,248,245,0.72)', textTransform: 'uppercase', marginBottom: '32px' }}>
-              Selected Work
-            </div>
-          </Reveal>
-          <div className="work-grid">
-            {projects.slice(0, 4).map((project, i) => (
-              <Reveal key={project.id} delay={i * 80}>
-                <ProjectCard project={project} />
-              </Reveal>
-            ))}
+  // Footer rendered twice, like the hero: dark-on-cream (base) and cream-on-olive
+  // (onFlower) clipped to a flower blooming from the bottom-left corner.
+  const footerText = (onFlower) => {
+    const cEye = onFlower ? 'rgba(250,248,245,0.6)' : 'var(--ink-muted)';
+    const cMail = onFlower ? 'var(--bg)' : 'var(--ink-deep)';
+    const cLink = onFlower ? 'rgba(250,248,245,0.85)' : 'var(--ink-soft)';
+    const cRule = onFlower ? 'rgba(250,248,245,0.22)' : 'var(--line)';
+    const cMeta = onFlower ? 'rgba(250,248,245,0.6)' : 'var(--ink-muted)';
+    return (
+      <>
+        <div className="eyebrow" style={{ color: cEye, marginBottom: '24px' }}>Get in touch</div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: '28px' }}>
+          <a href="mailto:samanthaho1021@gmail.com" style={{
+            fontFamily: 'var(--font-head)', fontSize: 'clamp(34px, 5.2vw, 66px)',
+            fontWeight: '400', letterSpacing: '0', lineHeight: '1.0', color: cMail,
+          }}>
+            samanthaho1021@gmail.com&nbsp;↗
+          </a>
+          <div style={{ display: 'flex', gap: '20px' }}>
+            <a href="https://www.linkedin.com/in/samantha-ho-uxdesigner/" target="_blank" rel="noreferrer" className="mono" style={{ fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', color: cLink }}>LinkedIn ↗</a>
+            <a href="/resume.pdf" target="_blank" rel="noreferrer" className="mono" style={{ fontSize: '12px', letterSpacing: '0.06em', textTransform: 'uppercase', color: cLink }}>Résumé ↗</a>
           </div>
         </div>
+        <hr className="rule" style={{ background: cRule, margin: '56px 0 20px' }} />
+        <div className="mono" style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px', fontSize: '11px', letterSpacing: '0.08em', textTransform: 'uppercase', color: cMeta }}>
+          <span>Samantha Ho — Product Manager</span>
+        </div>
+      </>
+    );
+  };
+
+  return (
+    <>
+      {/* Hero — a giant olive flower sits top-left; text over it flips to cream.
+          Built as two identical layers: a base (dark-on-cream) and a cream-on-olive
+          copy clipped to the flower shape, so the duotone contrast auto-aligns. */}
+      <section style={{ position: 'relative', overflow: 'hidden', paddingTop: '150px', paddingBottom: '72px' }}>
+        {/* flower clip geometry (shared coordinate space with the section) */}
+        <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+          <clipPath id="heroFlower" clipPathUnits="userSpaceOnUse">
+            {[0, 72, 144, 216, 288].map(a => (
+              <ellipse key={a} cx="50" cy="27" rx="13" ry="20"
+                transform={`translate(300 290) scale(7.4) translate(-50 -50) rotate(${a} 50 50)`} />
+            ))}
+            <circle cx="50" cy="50" r="12" transform="translate(300 290) scale(7.4) translate(-50 -50)" />
+          </clipPath>
+        </svg>
+
+        {/* Base layer — dark ink on cream */}
+        <div className="home-inner" style={{ position: 'relative', zIndex: 1 }}>
+          {heroText(false)}
+        </div>
+
+        {/* Cream-on-olive layer, clipped to the flower */}
+        <div
+          className="home-inner hero-clip-layer"
+          aria-hidden="true"
+          style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            paddingTop: '150px',
+            background: 'var(--accent)',
+            clipPath: 'url(#heroFlower)',
+            WebkitClipPath: 'url(#heroFlower)',
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}
+        >
+          {heroText(true)}
+        </div>
       </section>
 
-      {/* Remaining work on beige */}
-      <section className="home-inner" style={{ paddingTop: '56px', paddingBottom: '96px' }}>
+      {/* Selected Work — catalog */}
+      <section className="home-inner" style={{ paddingTop: '96px', paddingBottom: '104px' }}>
+        <Reveal>
+          <hr className="rule" style={{ background: 'var(--ink-deep)', opacity: 0.85 }} />
+          <div style={{ display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', padding: '16px 0 44px' }}>
+            <span className="eyebrow" style={{ color: 'var(--ink)', fontSize: '12px' }}>Selected Work</span>
+            <span className="mono" style={{ fontSize: '12px', color: 'var(--ink-muted)' }}>({String(projects.length).padStart(2, '0')})</span>
+          </div>
+        </Reveal>
         <div className="work-grid">
-          {projects.slice(4).map((project, i) => (
-            <Reveal key={project.id} delay={i * 80}>
+          {projects.map((project, i) => (
+            <Reveal key={project.id} delay={(i % 2) * 90}>
               <ProjectCard project={project} />
             </Reveal>
           ))}
         </div>
       </section>
 
-      {/* Footer — diagonal green band (slopes the opposite way) */}
-      <section className="green-band band-footer" style={{ paddingTop: '116px', paddingBottom: '72px', marginTop: '-48px' }}>
-        <div className="home-inner">
-          <Reveal>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-              <div style={{ fontFamily: 'var(--serif)', fontSize: '18px', color: 'var(--bg)' }}>
-                Samantha Ho
-              </div>
-              <div style={{ display: 'flex', gap: '24px' }}>
-                <a href="mailto:samanthaho1021@gmail.com" style={{ fontSize: '13px', color: 'rgba(250,248,245,0.85)' }}>
-                  samanthaho1021@gmail.com
-                </a>
-                <a href="https://www.linkedin.com/in/samantha-ho-uxdesigner/" target="_blank" rel="noreferrer" style={{ fontSize: '13px', color: 'rgba(250,248,245,0.85)' }}>
-                  LinkedIn ↗
-                </a>
-              </div>
-            </div>
-          </Reveal>
+      {/* Footer — olive flower on cream, duotone (mirrors the hero) */}
+      <section style={{ position: 'relative', overflow: 'hidden', background: 'var(--bg)', paddingTop: '88px', paddingBottom: '40px' }}>
+        {/* flower clip geometry — blooms from the bottom-left corner */}
+        <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+          <clipPath id="footerFlower" clipPathUnits="userSpaceOnUse">
+            {[0, 72, 144, 216, 288].map(a => (
+              <ellipse key={a} cx="50" cy="27" rx="13" ry="20"
+                transform={`translate(1360 250) scale(5.2) translate(-50 -50) rotate(${a} 50 50)`} />
+            ))}
+            <circle cx="50" cy="50" r="12" transform="translate(1360 250) scale(5.2) translate(-50 -50)" />
+          </clipPath>
+        </svg>
+
+        {/* Base layer — dark ink on cream */}
+        <div className="home-inner" style={{ position: 'relative', zIndex: 1 }}>
+          {footerText(false)}
+        </div>
+
+        {/* Cream-on-olive layer, clipped to the flower */}
+        <div
+          className="home-inner footer-clip-layer"
+          aria-hidden="true"
+          style={{
+            position: 'absolute', top: 0, left: 0, right: 0, bottom: 0,
+            paddingTop: '88px',
+            background: 'var(--accent)',
+            clipPath: 'url(#footerFlower)',
+            WebkitClipPath: 'url(#footerFlower)',
+            pointerEvents: 'none',
+            zIndex: 2,
+          }}
+        >
+          {footerText(true)}
         </div>
       </section>
     </>
@@ -594,36 +641,76 @@ function HomePage() {
 // ── ABOUT PAGE ─────────────────────────────────────────────
 function AboutPage() {
   const IMG = '/about-media';
-  const heading = { fontFamily: 'var(--serif)', fontSize: 'clamp(24px, 3.2vw, 30px)', lineHeight: '1.25', color: 'var(--ink)', margin: '0 0 20px' };
-  const para = { fontSize: '17px', color: 'var(--ink-soft)', lineHeight: '1.8', marginBottom: '18px', fontWeight: '300' };
-  const frame = { width: '100%', display: 'block', borderRadius: '12px', border: '1px solid var(--border)', boxShadow: '0 8px 30px rgba(62,42,31,0.08)' };
+  const heading = { fontFamily: 'var(--font-head)', fontSize: 'clamp(30px, 3.6vw, 40px)', fontWeight: '400', letterSpacing: '0', lineHeight: '1.02', color: 'var(--ink-deep)', margin: '0 0 20px' };
+  const para = { fontSize: '17px', color: 'var(--ink-soft)', lineHeight: '1.8', marginBottom: '18px' };
+  const frame = { width: '100%', display: 'block', borderRadius: '2px', border: '1px solid var(--line)' };
+
+  const SectionHead = ({ label, index }) => (
+    <>
+      <hr className="rule" />
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '16px 0 28px' }}>
+        <span className="eyebrow" style={{ color: 'var(--ink)', fontSize: '12px' }}>{label}</span>
+        <span className="mono" style={{ fontSize: '12px', color: 'var(--ink-muted)' }}>{index}</span>
+      </div>
+    </>
+  );
+
+  const contactBtn = {
+    fontFamily: 'var(--font-mono)', fontSize: '12px', fontWeight: '600',
+    letterSpacing: '0.06em', textTransform: 'uppercase',
+    padding: '13px 22px', borderRadius: '2px',
+  };
 
   return (
     <div className="page-body">
-      <div className="fade-up stagger-1" style={{ marginBottom: '48px' }}>
-        <div style={{ fontSize: '11px', fontWeight: '600', letterSpacing: '0.1em', color: 'var(--ink-muted)', textTransform: 'uppercase', marginBottom: '20px' }}>About</div>
-        <h1 style={{ fontFamily: 'var(--serif)', fontSize: 'clamp(36px, 5vw, 52px)', lineHeight: '1.15', margin: 0 }}>
-          A little bit about me
+      <div className="fade-up stagger-1" style={{ marginBottom: '56px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px' }}>
+          <span className="dot" style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent)', display: 'inline-block' }} />
+          <span className="eyebrow" style={{ color: 'var(--accent)' }}>About</span>
+        </div>
+        <h1 style={{ fontFamily: 'var(--font-head)', fontSize: 'clamp(48px, 6.4vw, 82px)', fontWeight: '400', letterSpacing: '0', lineHeight: '0.98', margin: 0, color: 'var(--ink-deep)' }}>
+          Product manager,<br />systems thinker, marathoner.
         </h1>
       </div>
 
       {/* Bio + portrait */}
-      <div className="fade-up stagger-2 about-bio" style={{ marginBottom: '72px' }}>
+      <div className="fade-up stagger-2 about-bio" style={{ marginBottom: '88px' }}>
         <div>
-          <p style={para}>I'm a product designer with 3+ years across B2B SaaS startups and enterprise software, spanning cloud marketplace tooling, biotech platforms, and NGO service design.</p>
-          <p style={para}>Currently at Suger, I design AI-powered features for a Cloud GTM platform used by companies selling on AWS, GCP, and Azure. I've worked directly with AWS on AI MCP feature launches, designed CRM-integrated tools like an engagement score built on Salesforce, and led the full website rebuild in under two weeks using AI-assisted development tools like Claude Code and Lovable. I'm comfortable owning design end-to-end, from shaping product scope with PMs to shipping alongside engineers in Agile workflows.</p>
-          <p style={para}>Before that, I was at Revvity, a large-scale biotech company, where I led new product initiatives, drove design-system accessibility improvements (WCAG), and streamlined workflows that reduced implementation time by 70%. That role taught me how to operate inside complex enterprise systems while keeping the user experience sharp.</p>
-          <p style={{ ...para, marginBottom: 0 }}>I hold a Master of Information in UX Design from the University of Toronto, with a focus on accessibility, research, and systems thinking. I also have a background in healthcare and have done design work with Greenpeace, which keeps me grounded in designing for real people, not just edge cases.</p>
+          <p style={para}>I'm a design-led product manager with 4+ years across B2B SaaS, enterprise software, biotech, and NGO work. I take products from an ambiguous problem to a shipped, measurable launch — owning the arc, not just the screens.</p>
+          <p style={para}>At Suger, I own AI-powered product areas on a Cloud GTM platform used by AWS, GCP, and Azure partners. That means shaping scope and priorities with stakeholders, writing the requirements and the developer/API docs, and shipping alongside engineers in Agile cycles. I've led AI (MCP) feature launches with AWS, defined CRM-integrated tools like a Salesforce engagement score, and drove a full website rebuild in under two weeks with AI-assisted tooling like Claude Code and Lovable. Because I came up through design, I can prototype what I spec and ship with craft.</p>
+          <p style={para}>Before Suger, at Revvity — a large-scale biotech company — I led new product initiatives, drove accessibility (WCAG) improvements, and streamlined workflows that cut implementation time by 70%. That's where I learned to move product inside complex enterprise systems without losing the user.</p>
+          <p style={{ ...para, marginBottom: 0 }}>I hold a Master of Information in UX Design from the University of Toronto, with a focus on research, accessibility, and systems thinking — the discovery muscles I lean on most as a PM. A background in healthcare and design work with Greenpeace keep me grounded in building for real people, not just edge cases.</p>
         </div>
         <div>
           <img src={`${IMG}/portrait.jpg`} alt="Samantha Ho" loading="lazy" style={{ ...frame, aspectRatio: '3 / 4', objectFit: 'cover' }} />
         </div>
       </div>
 
-      {/* How I got into UX */}
-      <div className="fade-up" style={{ marginBottom: '72px' }}>
-        <h2 style={heading}>How I got into UX</h2>
-        <p style={{ ...para, maxWidth: '740px' }}>Before becoming a designer, I worked as a disability management associate, helping employees navigate workplace accommodations and return-to-work programs. I saw firsthand how poor workflows and unclear systems could add unnecessary stress to people already facing challenges. That experience sparked my passion for designing tools and processes that remove friction, empower users, and make complex systems easier to navigate, and it ultimately led me to UX design.</p>
+      {/* What I do — PM capabilities */}
+      <div className="fade-up" style={{ marginBottom: '88px' }}>
+        <SectionHead label="What I do" index="01" />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '0 48px' }}>
+          {[
+            'Product discovery & framing',
+            'Scope, prioritization & roadmap',
+            'Cross-functional delivery (PM + eng)',
+            'AI product features',
+            'API / developer documentation',
+            'Design systems & UX',
+          ].map((cap, i) => (
+            <div key={cap} style={{ display: 'flex', alignItems: 'baseline', gap: '14px', padding: '17px 0', borderTop: '1px solid var(--line)' }}>
+              <span className="mono" style={{ fontSize: '12px', color: 'var(--accent)', flexShrink: 0 }}>{String(i + 1).padStart(2, '0')}</span>
+              <span style={{ fontSize: '17px', color: 'var(--ink)', fontWeight: '500' }}>{cap}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* How I got into product */}
+      <div className="fade-up" style={{ marginBottom: '88px' }}>
+        <SectionHead label="Origin" index="02" />
+        <h2 style={heading}>How I got into product</h2>
+        <p style={{ ...para, maxWidth: '740px' }}>Before tech, I worked as a disability management associate, helping employees navigate workplace accommodations and return-to-work programs. I saw firsthand how broken workflows and unclear systems pile stress onto people already facing challenges. Fixing that — the process, not just the interface — is what pulled me into building products: first through design, and now as a PM shaping what gets built and why.</p>
         <div className="cs-2col">
           <img src={`${IMG}/ux-1.jpg`} alt="" loading="lazy" style={frame} />
           <img src={`${IMG}/ux-2.jpg`} alt="" loading="lazy" style={frame} />
@@ -631,25 +718,26 @@ function AboutPage() {
       </div>
 
       {/* Recommendations */}
-      <div className="fade-up" style={{ marginBottom: '72px' }}>
-        <h2 style={heading}>Recommendations</h2>
+      <div className="fade-up" style={{ marginBottom: '88px' }}>
+        <SectionHead label="References" index="03" />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
           {[
             { quote: 'I had the pleasure of supervising Samantha during her co-op term, and she made an outstanding contribution to our team. She quickly adapted to our fast-paced environment at Revvity, demonstrating a keen ability to learn new concepts and apply them effectively, especially in the complex healthcare UX space. Samantha impressed me with her strong work ethic, attention to detail, and proactive approach to problem-solving. She consistently delivered high-quality work, met challenging deadlines, and was always eager to help colleagues. Her curiosity and commitment to understanding both UX principles and the healthcare sector resulted in solutions that were both practical and innovative.', name: 'Sharath Sundar', title: 'Manager, UX & AI Ops @ Revvity · managed me directly' },
             { quote: "Samantha is an exceptionally talented UX designer. Throughout my time working with her, I've seen her bring countless digital interface projects to life. I am consistently impressed by her ability to transform design requirements into tangible, user-friendly screens with remarkable fluidity. She is also deeply thoughtful about the user experience. As her UX researcher, I appreciated how readily she sought insights on UX principles and best practices to refine her work. Her proactive approach highlights both her dedication to excellence and her strong commitment to cross-functional collaboration.", name: 'Dareen Christabel', title: 'UX Researcher @ Revvity · same team' },
-          ].map(({ quote, name, title }) => (
-            <div key={name} style={{ background: 'var(--white)', border: '1px solid var(--border)', borderRadius: '12px', padding: '28px 30px' }}>
-              <p style={{ fontFamily: 'var(--serif)', fontSize: '16px', color: 'var(--ink)', lineHeight: '1.7', margin: '0 0 16px' }}>&ldquo;{quote}&rdquo;</p>
-              <div style={{ fontSize: '14px', fontWeight: '600', color: 'var(--ink)' }}>{name}</div>
-              <div style={{ fontSize: '13px', color: 'var(--ink-muted)', marginTop: '2px' }}>{title}</div>
+          ].map(({ quote, name, title }, i) => (
+            <div key={name} style={{ background: 'var(--white)', border: '1px solid var(--line)', borderRadius: '2px', padding: '30px 32px' }}>
+              <div className="mono" style={{ fontSize: '11px', letterSpacing: '0.08em', color: 'var(--ink-muted)', marginBottom: '18px' }}>{`REF ${String(i + 1).padStart(2, '0')}`}</div>
+              <p style={{ fontSize: '17px', color: 'var(--ink)', lineHeight: '1.7', margin: '0 0 20px' }}>&ldquo;{quote}&rdquo;</p>
+              <div style={{ fontFamily: 'var(--font-display)', fontSize: '15px', fontWeight: '700', color: 'var(--ink-deep)' }}>{name}</div>
+              <div className="mono" style={{ fontSize: '11px', letterSpacing: '0.04em', color: 'var(--ink-muted)', marginTop: '5px', textTransform: 'uppercase' }}>{title}</div>
             </div>
           ))}
         </div>
       </div>
 
       {/* When I'm not designing */}
-      <div className="fade-up" style={{ marginBottom: '56px' }}>
-        <h2 style={heading}>When I'm not designing</h2>
+      <div className="fade-up" style={{ marginBottom: '80px' }}>
+        <SectionHead label="Off the clock" index="04" />
         <p style={{ ...para, maxWidth: '740px' }}>You'll probably find me with paint on my hands, flying down a snowy hill, or running around Toronto training for my next marathon. I love finding new ways to challenge myself, whether it's experimenting with watercolor techniques, snowboarding new terrain, or hitting a new personal record on race day. 🤗</p>
         <div className="about-photos">
           {['hobby-1', 'hobby-2', 'hobby-3'].map(n => (
@@ -659,18 +747,12 @@ function AboutPage() {
       </div>
 
       {/* Contact */}
-      <div className="fade-up" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-        <a href="mailto:samanthaho1021@gmail.com" style={{
-          display: 'inline-flex', alignItems: 'center', gap: '8px',
-          background: 'var(--accent)', color: 'white', padding: '12px 24px',
-          borderRadius: '100px', fontSize: '14px', fontWeight: '500',
-        }}>Get in touch ↗</a>
-        <a href="https://www.linkedin.com/in/samantha-ho-uxdesigner/" target="_blank" rel="noreferrer" style={{
-          display: 'inline-flex', alignItems: 'center', gap: '8px',
-          background: 'var(--white)', color: 'var(--ink)', padding: '12px 24px',
-          borderRadius: '100px', fontSize: '14px', fontWeight: '500',
-          border: '1px solid var(--border)',
-        }}>LinkedIn ↗</a>
+      <div className="fade-up">
+        <hr className="rule" />
+        <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', paddingTop: '32px' }}>
+          <a href="mailto:samanthaho1021@gmail.com" style={{ ...contactBtn, background: 'var(--accent)', color: 'var(--bg)' }}>Get in touch ↗</a>
+          <a href="https://www.linkedin.com/in/samantha-ho-uxdesigner/" target="_blank" rel="noreferrer" style={{ ...contactBtn, background: 'transparent', color: 'var(--ink)', border: '1px solid var(--line)' }}>LinkedIn ↗</a>
+        </div>
       </div>
     </div>
   );
@@ -1411,7 +1493,7 @@ function SugerCaseStudy() {
         <div style={{ maxWidth: '900px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0' }}>
           {[
             { label: 'Company', value: 'Suger.io' },
-            { label: 'Role', value: 'Product Designer (Lead)' },
+            { label: 'Role', value: 'Product Manager (Lead)' },
             { label: 'Timeline', value: '2025–2026' },
             { label: 'Status', value: 'Shipped · In Progress' },
           ].map(({ label, value }, i) => (
